@@ -1,0 +1,9 @@
+{
+    "modelName": "sf_car_using_duration",
+    "modelPath": "./MATLAB/Examples/R2021a/stateflow/AutomaticTransmissionUsingDurationOperatorExample/sf_car_using_duration",
+    "outputValues": {
+        "values": ["vspeed.signals.values", "revs.signals.values", "gear.signals.values"],
+        "time": "vspeed.time"
+    },
+    "noiseValues": [["throttle.signals.values", "throttleNoise"], ["brake.signals.values", "brakeNoise"]]
+}

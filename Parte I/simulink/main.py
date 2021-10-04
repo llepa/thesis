@@ -4,9 +4,13 @@ import matlab.engine
 
 def main():
 
-	sm = ml.SimulinkPlant('sf_car_using_duration', './MATLAB/Examples/R2021a/stateflow/AutomaticTransmissionUsingDurationOperatorExample/sf_car_using_duration', ['vspeed.signals.values', 'revs.signals.values', 'gear.signals.values'], 'vspeed.time')
+	sm = ml.SimulinkPlant('input.json')
 	sm.connectToMatlab()
-	sm.simulate()
+	error = True
+	sm.simulate(error)
+	sm.outValues
+	sm.simulate(False)
+	sm.outValues
 	
 	sm.disconnect()
 	

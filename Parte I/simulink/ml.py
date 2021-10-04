@@ -5,16 +5,20 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import throttle
+import json
+import random
 
 class SimulinkPlant:
 
-    def __init__(self, modelName, modelPath, outValues, timestamps):
-        self.modelName = modelName
-        self.modelPath = modelPath
+    def __init__(self, jsonFile):
+        f = open(jsonFile, 'r')
+        self.inJ = json.load(f)
+        self.modelName = self.inJ['modelName']
+        self.modelPath = self.inJ['modelPath']
+        self.noiseValues = self.inJ['noiseValues']
+        self.outValues = self.inJ['outputValues']['values']
+        self.outTS = self.inJ['outputValues']['time']
         self.out = dict()
-        self.outValues = outValues
-        self.outTS = timestamps
-        
 
     def setValue(self, varName, value):
 
@@ -22,8 +26,29 @@ class SimulinkPlant:
         # self.eng.set_param(self.handle, varName, str(value), nargout=0)
         self.eng.set_param(self.modelName + '/' + varName, 'Value', str(value), nargout=0)
 
-    def connectToMatlab(self):
 
+    def getConstValue(self, value):
+        return self.eng.get_param(self.modelName + '/' + value, 'Value')
+
+
+    def getLastValue(self, value):
+        return self.eng.eval(value)[-1]
+
+
+    def getValue(self, value):
+
+        # Helper function to get plant output and time 
+        try:
+            print(self.eng.eval(value))
+            return self.eng.eval(value)
+        except:
+            print(value + ': Matlab type not supported in Python; converting...')
+            #print(value)
+            #print(type(value))
+            return self.eng.eval('cast(vspeed.time, "int64")')
+
+
+    def connectToMatlab(self):
         # Starting and connecting to Matlab
         print('Connecting...')
         print('Starting Matlab...')
@@ -35,24 +60,8 @@ class SimulinkPlant:
 
         self.eng.eval('model = "{}"'.format(self.modelPath), nargout=0)
         self.handle = self.eng.eval('load_system(model)')
-
-        self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
-
         print('Model loaded')
         print('Connected')
-
-
-    def getValue(self, value):
-
-        # Helper function to get plant output and time 
-        try:
-            return self.eng.eval(value)
-        except:
-            print(value + ': Matlab type not supported in Python; converting...')
-            #print(value)
-            #print(type(value))
-            return self.eng.eval('cast(vspeed.time, "int64")')
-
 
     def intializeGraph(self):
 
@@ -60,10 +69,7 @@ class SimulinkPlant:
         plt.close()
         plt.ion()
         for value in self.outValues:
-            r = np.random.randint(256)
-            g = np.random.randint(256)
-            b = np.random.randint(256)
-            plt.plot(self.outTS, self.out[value], label=value)
+            plt.plot(self.out[self.outTS], self.out[value], label=value)
             plt.legend()
         plt.title('test')
         plt.show()
@@ -81,31 +87,34 @@ class SimulinkPlant:
         plt.show()
 
 
-    def simulate(self):
+    def simulate(self, introduceError):
 
-        t = 1           # the simulation stops 25 times per second
-        sampleTime = 1  # second(s), chosen in [0.04, x], where x is the stop time of the simulation
+        t = 1               # the simulation stops 25 times per second
+        sampleTime = 25     # second(s), chosen in [0.04, x], where x is the stop time of the simulation
+        
+        self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
 
-        while (self.eng.get_param(self.handle, 'SimulationStatus') != ('stopped' or 'terminating')):
-            
-            '''
-            print('Initializing variable: sigin')    
-            
-            print(t.getValues())
-            self.setValue('sigin', matlab.double(t.getValues()))
-            print('Variable sigin initialized')
-            '''
-            #t = throttle.ThrottleMarkov(5, 100, 50)
-
-            #if (not (t / 25) % sampleTime):
-                # thr = self.getValue('throttle')
+        if (introduceError):
+            while (self.eng.get_param(self.handle, 'SimulationStatus') != ('stopped' or 'terminating')):     
+                '''
+                print('Initializing variable: sigin')    
                 
-            self.setValue('throttleNoise', 100)
-            self.eng.set_param(self.handle, 'SimulationCommand', 'continue', 'SimulationCommand', 'pause', nargout=0)
+                print(t.getValues())
+                self.setValue('sigin', matlab.double(t.getValues()))
+                print('Variable sigin initialized')
+                '''
 
-            t += 1
+                if (t % sampleTime == 0):
+                    for value in self.noiseValues:
+                        nominalVal = np.array(self.getLastValue(value[0]))[-1]
+                        #nominalVal.astype(float)
+                        self.setValue(value[1], str(nominalVal + random.random() * 10))
+                t += 1
+                self.eng.set_param(self.handle, 'SimulationCommand', 'continue', 'SimulationCommand', 'pause', nargout=0) 
+        else:
+            self.eng.set_param(self.handle, 'SimulationCommand', 'continue', nargout=0)
 
-        self.outTS = self.getValue(self.outTS)
+        self.out[self.outTS] = self.getValue(self.outTS)
 
         for value in self.outValues:
             self.out[value] = self.getValue(value)
