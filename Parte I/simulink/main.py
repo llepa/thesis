@@ -8,13 +8,12 @@ def main():
 	sm.connectToMatlab()
 	error = True
 	sm.simulate(error)
-	sm.outValues
-	sm.simulate(False)
-	sm.outValues
+	#sm.outValues
+	#sm.simulate(False)
+	#sm.outValues
 	
 	sm.disconnect()
 	
-
 	#print()
 	#print(sm.out)
 

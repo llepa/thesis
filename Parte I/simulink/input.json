@@ -5,5 +5,5 @@
         "values": ["vspeed.signals.values", "revs.signals.values", "gear.signals.values"],
         "time": "vspeed.time"
     },
-    "noiseValues": [["throttle.signals.values", "throttleNoise"], ["brake.signals.values", "brakeNoise"]]
+    "noiseValues": [["throttle.signals.values", "throttleNoise"]]
 }
