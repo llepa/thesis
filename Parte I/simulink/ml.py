@@ -14,11 +14,13 @@ class SimulinkPlant:
     def __init__(self, jsonFile):
         f = open(jsonFile, 'r')
         self.inJ = json.load(f)
-        self.modelName = self.inJ['modelName']
-        self.modelPath = self.inJ['modelPath']
-        self.noiseValues = self.inJ['noiseValues']
-        self.outValues = self.inJ['outputValues']['values']
-        self.outTS = self.inJ['outputValues']['time']
+        i = 1
+        self.models = self.inJ["models"]
+        self.modelName = self.models[i]["modelName"]
+        self.modelPath = self.models[i]["modelPath"]
+        self.noiseValues = self.models[i]["noiseValues"]
+        self.outValues = self.models[i]["outputValues"]["values"]
+        self.outTS = self.models[i]["outputValues"]["time"]
         self.out = dict()
 
     def setValue(self, varName, value):

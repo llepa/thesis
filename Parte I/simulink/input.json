@@ -11,8 +11,8 @@
         },
         {
             "modelName": "aero_dap3dof",
-            "modelPath": "./MATLAB/Examples/R2021a/simulink_aerospace/DevelopingTheApolloLunaModuleDigitalAutopolotExample/aero_dap3dof",
-            "outValues": {
+            "modelPath": "./MATLAB/Examples/R2021a/simulink_aerospace/DevelopingTheApolloLunarModuleDigitalAutopilotExample/aero_dap3dof",
+            "outputValues": {
                 "values": [],
                 "time": ""
             },
