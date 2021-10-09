@@ -1,3 +1,4 @@
+from typing import overload
 import matlab.engine
 import time
 import re
@@ -86,60 +87,64 @@ class SimulinkPlant:
         plt.show()
 
 
+    def print(self):
+        graphString = ""
+        legendString = ""
+        for val in self.outValues:
+            graphString += self.outTS + ','
+            graphString += val + ','
+            legendString += "\'" + val + "\',"
+        printString = graphString[0: len(graphString)-1]
+        legendString = legendString[0: len(legendString)-1]
+        #self.eng.eval('f1 = figure')
+        self.eng.eval('plot(' + printString + ')')
+        self.eng.eval('legend({' + legendString + '})')
+        #self.eng.eval('print("f1", "-djpeg")')
+
+
     def simulate(self, introduceError):
 
-        t = 1               # the simulation stops 25 times per second
-        sampleTime = 150    # second(s), chosen in [0.04, x], where x is the stop time of the simulation
-        
+        t = 0.04             # the simulation stops 25 times per second
+        sampleTime = 0.04    # second(s), chosen in [0.04, x], where x is the stop time of the simulation
+        epsilon = 0.000000005
         self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
 
-        print('Value of ' + 'throttle.signals.values' + 'before starting simulation: ' + str(self.getValue('throttle.signals.values')))
+        #print('Value of ' + 'throttle.signals.values' + 'before starting simulation: ' + str(self.getValue('throttle.signals.values')))
 
         if (introduceError):
             while (self.eng.get_param(self.handle, 'SimulationStatus') != ('stopped' or 'terminating')):     
-                '''
-                print('Initializing variable: sigin')    
-                
-                print(t.getValues())
-                self.setValue('sigin', matlab.double(t.getValues()))
-                print('Variable sigin initialized')
-                '''
-
-                # CAPIRE COME CAZZO AGGIUNGERE RUMORE ALL'ISTANTE t BASANDOSI SUL VALORE DEL SEGNALE ALL'ISTNATE t
-                if (t % sampleTime == 0):
+                #print("Time: " + str(t))
+                # OVVIAMENTE CORREGGERE QUESTO OBROBRIO QUI SOTTO !!!
+                if (True):
                     for value in self.noiseValues:
-                        nominalVal = np.array(self.getLastValue(value[0]))[-1]
+                        #nominalVal = np.array(self.getLastValue(value[0]))[-1]
                         #nominalVal.astype(float)
-                        r = random.random() * 10
+                        r = random.random() - 0.5 
                         self.setValue(value[1], str(r))
-                        '''print(value[1] + ' before adding noise: ' + str(nominalVal))
-                        print(value[1] + ' adding noise: ' + str(r))
-                        o = np.array(self.getValue('simout.signals.values'))[-1]
-                        print('Value that has been detected on output after adding noise: ' + str(o) + '. Should be: ' + str(nominalVal + r))
-                        print()
-                        '''
+                '''
                 else:
                     for value in self.noiseValues:
                         self.setValue(value[1], str(0))
-
-                t += 1
+                '''
+                t += 0.04
                 self.eng.set_param(self.handle, 'SimulationCommand', 'continue', 'SimulationCommand', 'pause', nargout=0) 
         else:
             self.eng.set_param(self.handle, 'SimulationCommand', 'continue', nargout=0)
 
-        #print(self.getValue('simout.signals.values'))
-
+        '''
         self.out[self.outTS] = self.getValue(self.outTS)
 
         for value in self.outValues:
             self.out[value] = self.getValue(value)
-
-        self.intializeGraph()  
+        '''
+        
+        #self.intializeGraph()  
+        self.print()
 
         s = ''
         while(s != 'y'):
             s = input('Do you want to finish the simulation? [y/n]: ')
-
+        
         print('Simulation ended')
 
 
