@@ -98,6 +98,8 @@ class SimulinkPlant:
             legendString += "\'" + val + "\',"
         printString = graphString[0: len(graphString)-1]
         legendString = legendString[0: len(legendString)-1]
+        #print(printString)
+        #print(legendString)
         self.eng.eval('plot(' + printString + ')')
         self.eng.eval('legend({' + legendString + '})')
 
@@ -106,10 +108,15 @@ class SimulinkPlant:
         self.eng.eval('sim("' + self.modelName + '")', nargout=0)
 
 
+    def update(self):
+        self.eng.set_param(self.handle, 'SimulationCommand', 'update', nargout=0)
+
+
     def initializeValues(self):
         for value in self.noiseValues:
             r = random.random() - 0.5
             self.setValue(value[1], str(r))
+            self.update()
 
     def simulate(self, introduceError):
         print('Starting simulation...')
@@ -120,7 +127,7 @@ class SimulinkPlant:
         #self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
 
         self.initializeValues()
-        
+
         if (introduceError):
             self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
             #t += 1
@@ -144,7 +151,6 @@ class SimulinkPlant:
             self.fullSimulate()
             
                
-        
         print("Simulation time: " + str(time.time() - startTime) + " seconds")
         if (introduceError):
             print("Number of steps taken: " + str(t))
