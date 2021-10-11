@@ -112,7 +112,7 @@ t_poweredDescentStart   = t_rangeZero + hours(102) + minutes(33) + seconds(5.2);
 
 MissionPhase = {'Range Zero (lift-off)', 'Descent Orbit Insertion (Engine ignition)', 'Descent Orbit Insertion (Engine cutoff)', 'Powered Descent (Engine ignition)'}';
 MissionTime_GMT = [t_rangeZero, t_descentInsertionStart, t_descentInsertion, t_poweredDescentStart]';
-disp(timetable(MissionTime_GMT, MissionPhase));
+%disp(timetable(MissionTime_GMT, MissionPhase));
 
 %%
 % The trajectory of the module at Descent orbit insertion (Engine cutoff)
@@ -126,7 +126,7 @@ Longitude_deg = [-141.88, 39.39]'; % [deg]
 Altitude_mi   = [57.8, 6.4]';      % [nautical miles] (Final measured altitude ~1.8 mi lower than projected)
 Altitude_ft   = convlength(Altitude_mi, 'naut mi', 'ft');
 Velocity_fps  = [5284.9, 5564.9]'; % [ft/s]
-disp(table(MissionPhase(3:4), Latitude_deg, Longitude_deg, Altitude_mi, Altitude_ft, Velocity_fps));
+%disp(table(MissionPhase(3:4), Latitude_deg, Longitude_deg, Altitude_mi, Altitude_ft, Velocity_fps));
 
 %%
 %

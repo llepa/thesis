@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-class ThrottleMarkov:
+class Markov:
 
 	outValues = list()
 	state = 1

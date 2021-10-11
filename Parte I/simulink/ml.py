@@ -5,7 +5,7 @@ import re
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-import throttle
+import markov
 import json
 import random
 
@@ -14,14 +14,15 @@ class SimulinkPlant:
     def __init__(self, jsonFile):
         f = open(jsonFile, 'r')
         self.inJ = json.load(f)
-        i = 1
+        m = 1
         self.models = self.inJ["models"]
-        self.modelName = self.models[i]["modelName"]
-        self.modelPath = self.models[i]["modelPath"]
-        self.noiseValues = self.models[i]["noiseValues"]
-        self.outValues = self.models[i]["outputValues"]["values"]
-        self.outTS = self.models[i]["outputValues"]["time"]
+        self.modelName = self.models[m]["modelName"]
+        self.modelPath = self.models[m]["modelPath"]
+        self.noiseValues = self.models[m]["noiseValues"]
+        self.outValues = self.models[m]["outputValues"]["values"]
+        self.outTS = self.models[m]["outputValues"]["time"]
         self.out = dict()
+
 
     def setValue(self, varName, value):
         # Helper function to set value of control action
@@ -45,7 +46,8 @@ class SimulinkPlant:
             print(value + ': Matlab type not supported in Python; converting...')
             #print(value)
             #print(type(value))
-            return self.eng.eval('cast(vspeed.time, "int64")')
+            return self.eng.eval('cast(' + value + ', "double")')
+        
 
 
     def connectToMatlab(self):
@@ -62,6 +64,7 @@ class SimulinkPlant:
         print('Model loaded')
         print('Connected')
 
+
     '''
     def intializeGraph(self):
         print('Initializing graph...')
@@ -75,6 +78,7 @@ class SimulinkPlant:
         plt.pause(0.1)
         print('Graph initialized')
 
+
     def updateGraph(self):
     
         self.fig.set_xdata(self.out['tout'])
@@ -85,7 +89,7 @@ class SimulinkPlant:
         plt.show()
     '''
 
-    def print(self):
+    def plot(self):
         graphString = ""
         legendString = ""
         for val in self.outValues:
@@ -98,20 +102,36 @@ class SimulinkPlant:
         self.eng.eval('legend({' + legendString + '})')
 
 
+    def fullSimulate(self):
+        self.eng.eval('sim("' + self.modelName + '")', nargout=0)
+
+
+    def initializeValues(self):
+        for value in self.noiseValues:
+            r = random.random() - 0.5
+            self.setValue(value[1], str(r))
+
     def simulate(self, introduceError):
-        t = 1                   # the simulation stops 25 times per second
-        sampleTime = 3         
+        print('Starting simulation...')
+        
+        t = 1                # the simulation stops _ times per second
+        sampleTime = 1         
+        startTime = time.time()
+        #self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
 
-        self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
-
+        self.initializeValues()
+        
         if (introduceError):
+            self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
+            #t += 1
             while (self.eng.get_param(self.handle, 'SimulationStatus') != ('stopped' or 'terminating')):     
                 if (not t % sampleTime):
                     for value in self.noiseValues:
                         #nominalVal = np.array(self.getLastValue(value[0]))[-1]
                         #nominalVal.astype(float)
-                        r = random.random() / 0.5 - 0.5     # based just on a random value but can be implemented in a more complex way
+                        r = random.random() - 0.5     # based just on a random value but can be implemented in a more complex way
                         self.setValue(value[1], str(r))
+                        self.eng.set_param(self.handle, 'SimulationCommand', 'update', nargout=0)
                 '''
                 else:
                     for value in self.noiseValues:
@@ -119,18 +139,25 @@ class SimulinkPlant:
                 '''
                 t += 1
                 self.eng.set_param(self.handle, 'SimulationCommand', 'continue', 'SimulationCommand', 'pause', nargout=0) 
+            #print(t)
         else:
-            self.eng.set_param(self.handle, 'SimulationCommand', 'continue', nargout=0)
-
-        '''
+            self.fullSimulate()
+            
+               
+        
+        print("Simulation time: " + str(time.time() - startTime) + " seconds")
+        if (introduceError):
+            print("Number of steps taken: " + str(t))
+            print("Sample time: " + str(12 / t))
+        
+        
+        # interested simulation values are saved in a dictionary
         self.out[self.outTS] = self.getValue(self.outTS)
 
         for value in self.outValues:
             self.out[value] = self.getValue(value)
-        '''
         
-        #self.intializeGraph()  
-        self.print()
+        self.plot()
 
         s = ''
         while(s != 'y'):

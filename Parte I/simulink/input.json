@@ -13,10 +13,10 @@
             "modelName": "aero_dap3dof",
             "modelPath": "./MATLAB/Examples/R2021a/simulink_aerospace/DevelopingTheApolloLunarModuleDigitalAutopilotExample/aero_dap3dof",
             "outputValues": {
-                "values": [],
-                "time": ""
+                "values": ["yaw.signals.values", "pitch.signals.values", "roll.signals.values"], 
+                "time": "yaw.time"
             },
-            "noiseValues": []
+            "noiseValues": [["yaw.signals.values", "yawNoise"], ["pitch.signals.values", "pitchNoise"], ["roll.signals.values", "rollNoise"]]
     }
     ]
 
