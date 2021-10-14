@@ -46,9 +46,9 @@ class SimulinkPlant:
   # MODIFY THIS FUNCTION IN ORDER TO SET TO 0 THE ERROR WHEN introduceNoise IS SET TO False
     def initializeValues(self):
         for value in self.noiseValues:
-            r = random.random() - 0.5
+            r = random.random() / 10 
             self.setValue(value[1], str(r))
-            self.update()
+        self.update()
 
 
     def update(self):
@@ -115,6 +115,8 @@ class SimulinkPlant:
 
         if (introduceNoise):
             self.initializeValues()
+            self.directSimulate()
+            '''
             self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
             #t += 1
             while (self.eng.get_param(self.handle, 'SimulationStatus') != ('stopped' or 'terminating')):     
@@ -125,24 +127,25 @@ class SimulinkPlant:
                         r = random.random() - 0.5     # based just on a random value but can be implemented in a more complex way
                         self.setValue(value[1], str(r))
                         self.eng.set_param(self.handle, 'SimulationCommand', 'update', nargout=0)
-                '''
+                
                 else:
                     for value in self.noiseValues:
                         self.setValue(value[1], str(0))
-                '''
+                
                 t += 1
                 self.eng.set_param(self.handle, 'SimulationCommand', 'continue', 'SimulationCommand', 'pause', nargout=0) 
+                '''
         else:
             self.directSimulate()
-            
                
         print("Simulation time: " + str(time.time() - startTime) + " seconds")
+
+        '''
         if (introduceNoise):
             print("Number of steps taken: " + str(t))
             # DA RIVEDERE
             print("Sample time: " + str(12 / t))
         
-        '''
         # interested simulation values are saved in a dictionary
         for i in range(len(self.output)):
             self.out[self.output]
@@ -158,11 +161,14 @@ class SimulinkPlant:
 
     # first simulate the model without introducing noise, and then simulate it with noise 
     def fullSimulate(self):
+
         for b in [False, True]:
             self.simulate(b)
-            s = ''
-            while(s != 'y'):
-                s = input('Do you want to end the simulation? [y/n]: ')
+        s = ''
+        while(s != 'y'):
+            s = input('Do you want to end the simulation? [y/n]: ')
+        
+        
 
 
     def simulate_car(self):
