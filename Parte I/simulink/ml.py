@@ -1,8 +1,5 @@
-from typing import overload
 import matlab.engine
 import time
-import re
-import matplotlib.pyplot as plt
 import os
 import numpy as np
 import markov
@@ -11,21 +8,54 @@ import random
 
 class SimulinkPlant:
 
-    def __init__(self, jsonFile):
-        f = open(jsonFile, 'r')
-        self.inJ = json.load(f)
-        m = 1
-        self.models = self.inJ["models"]
-        self.modelName = self.models[m]["modelName"]
-        self.modelPath = self.models[m]["modelPath"]
-        self.noiseValues = self.models[m]["noiseValues"]
-        self.outValues = self.models[m]["outputValues"]["values"]
-        self.outTS = self.models[m]["outputValues"]["time"]
-        self.out = dict()
+    def __init__(self, json_file):
+        f = open(json_file, 'r')
+        self.in_j = json.load(f)
+        self.models = self.in_j["models"]
+
+
+    def extract_data(self, model):
+        self.modelName = self.models[model]["modelName"]
+        self.modelPath = self.models[model]["modelPath"]
+        self.noiseValues = self.models[model]["noiseValues"]
+        self.output = self.models[model]["output"]
+
+
+    def connectToMatlab(self):
+        # Starting and connecting to Matlab
+        print('Connecting...')
+        print('Starting Matlab...')
+        self.eng = matlab.engine.start_matlab()
+        print('Connected to Matlab')
+
+        # Loading the model
+        print('Loading model...')
+        self.eng.eval('model = "{}"'.format(self.modelPath), nargout=0)
+        self.handle = self.eng.eval('load_system(model)')
+        print('Model loaded')
+        print('Connected')
+
+
+    def disconnect(self):
+        print('Disconnecting...')
+        self.eng.set_param(self.handle, 'SimulationCommand', 'stop', nargout=0)
+        self.eng.quit()
+        print('Disconnected')
+
+
+  # MODIFY THIS FUNCTION IN ORDER TO SET TO 0 THE ERROR WHEN introduceNoise IS SET TO False
+    def initializeValues(self):
+        for value in self.noiseValues:
+            r = random.random() - 0.5
+            self.setValue(value[1], str(r))
+            self.update()
+
+
+    def update(self):
+        self.eng.set_param(self.handle, 'SimulationCommand', 'update', nargout=0)
 
 
     def setValue(self, varName, value):
-        # Helper function to set value of control action
         # self.eng.set_param(self.handle, varName, str(value), nargout=0)
         self.eng.set_param(self.modelName + '/' + varName, 'Value', str(value), nargout=0)
 
@@ -49,76 +79,31 @@ class SimulinkPlant:
             return self.eng.eval('cast(' + value + ', "double")')
         
 
-
-    def connectToMatlab(self):
-        # Starting and connecting to Matlab
-        print('Connecting...')
-        print('Starting Matlab...')
-        self.eng = matlab.engine.start_matlab()
-        print('Connected to Matlab')
-
-        # Loading the model
-        print('Loading model...')
-        self.eng.eval('model = "{}"'.format(self.modelPath), nargout=0)
-        self.handle = self.eng.eval('load_system(model)')
-        print('Model loaded')
-        print('Connected')
-
-
-    '''
-    def intializeGraph(self):
-        print('Initializing graph...')
-        plt.close()
-        plt.ion()
-        for value in self.outValues:
-            plt.plot(self.out[self.outTS], self.out[value], label=value)
-            plt.legend()
-        plt.title('test')
-        plt.show()
-        plt.pause(0.1)
-        print('Graph initialized')
-
-
-    def updateGraph(self):
-    
-        self.fig.set_xdata(self.out['tout'])
-        self.fig.set_ydata(self.out['output'])
-        #self.fig.set_ydata(self.out['simout'])
-
-        plt.pause(0.1)
-        plt.show()
-    '''
-
-    def plot(self):
+    def plot(self, plot_values, pos, n_plots):  
         graphString = ""
         legendString = ""
-        for val in self.outValues:
-            graphString += self.outTS + ','
-            graphString += val + ','
-            legendString += "\'" + val + "\',"
-        printString = graphString[0: len(graphString)-1]
+        for i in range(len(plot_values["values"])):
+            graphString += plot_values["timestamps"][i] + ','
+            graphString += plot_values["values"][i] + ','
+            legendString += "\'" + plot_values["values"][i] + "\',"
+        graphString = graphString[0: len(graphString)-1]
         legendString = legendString[0: len(legendString)-1]
-        #print(printString)
-        #print(legendString)
-        self.eng.eval('plot(' + printString + ')')
+        self.eng.eval('subplot(' + str(n_plots) + ',1,' + str(pos) + ')')
+        self.eng.eval('plot(' + graphString + ')')
         self.eng.eval('legend({' + legendString + '})')
 
 
-    def fullSimulate(self):
+    def plotAll(self):
+        self.eng.eval('figure')
+        for i in range(len(self.output)):
+            self.plot(self.output[i], i+1, len(self.output))
+
+
+    def directSimulate(self):
         self.eng.eval('sim("' + self.modelName + '")', nargout=0)
 
 
-    def update(self):
-        self.eng.set_param(self.handle, 'SimulationCommand', 'update', nargout=0)
-
-
-    def initializeValues(self):
-        for value in self.noiseValues:
-            r = random.random() - 0.5
-            self.setValue(value[1], str(r))
-            self.update()
-
-    def simulate(self, introduceError):
+    def simulate(self, introduceNoise):
         print('Starting simulation...')
         
         t = 1                # the simulation stops _ times per second
@@ -126,9 +111,10 @@ class SimulinkPlant:
         startTime = time.time()
         #self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
 
-        self.initializeValues()
+        #self.initializeValues()
 
-        if (introduceError):
+        if (introduceNoise):
+            self.initializeValues()
             self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
             #t += 1
             while (self.eng.get_param(self.handle, 'SimulationStatus') != ('stopped' or 'terminating')):     
@@ -146,34 +132,56 @@ class SimulinkPlant:
                 '''
                 t += 1
                 self.eng.set_param(self.handle, 'SimulationCommand', 'continue', 'SimulationCommand', 'pause', nargout=0) 
-            #print(t)
         else:
-            self.fullSimulate()
+            self.directSimulate()
             
                
         print("Simulation time: " + str(time.time() - startTime) + " seconds")
-        if (introduceError):
+        if (introduceNoise):
             print("Number of steps taken: " + str(t))
+            # DA RIVEDERE
             print("Sample time: " + str(12 / t))
         
-        
+        '''
         # interested simulation values are saved in a dictionary
+        for i in range(len(self.output)):
+            self.out[self.output]
+        
         self.out[self.outTS] = self.getValue(self.outTS)
 
-        for value in self.outValues:
+        for value in self.output:
             self.out[value] = self.getValue(value)
-        
-        self.plot()
+        '''
 
-        s = ''
-        while(s != 'y'):
-            s = input('Do you want to end the simulation? [y/n]: ')
-        
-        print('Simulation ended')
+        self.plotAll()
 
 
-    def disconnect(self):
-        print('Disconnecting...')
-        self.eng.set_param(self.handle, 'SimulationCommand', 'stop', nargout=0)
-        self.eng.quit()
-        print('Disconnected')
+    # first simulate the model without introducing noise, and then simulate it with noise 
+    def fullSimulate(self):
+        for b in [False, True]:
+            self.simulate(b)
+            s = ''
+            while(s != 'y'):
+                s = input('Do you want to end the simulation? [y/n]: ')
+
+
+    def simulate_car(self):
+        # extracts data needed to simulate the model
+        self.extract_data(0)
+        # load matlab and load the desired model 
+        self.connectToMatlab()
+        # run the simulation
+        self.fullSimulate()
+        # end the simulation, then the program
+        self.disconnect()
+
+
+    def simulate_apollo(self):
+        # extracts data needed to simulate the model
+        self.extract_data(1)
+        # load matlab and load the desired model 
+        self.connectToMatlab()
+        # run the simulation
+        self.fullSimulate()
+        # end the simulation, then the program
+        self.disconnect()

@@ -1,23 +1,14 @@
 import ml
 import markov
-import matlab.engine
+import sys
 
 def main():
-
-	# import the json configuration file 
+    
 	sm = ml.SimulinkPlant('input.json')
-
-	# load matlab and load the desired model 
-	sm.connectToMatlab()
-
-	# set the value of error: true if intended to introduce error in the system, false otherwise
-	error = False
-
-	# run the simulation
-	sm.simulate(error)
-
-	# end the simulation, then the program
-	sm.disconnect()
+	if(sys.argv[1] == 'car'):
+		sm.simulate_car()
+	elif(sys.argv[1] == 'apollo'):
+    		sm.simulate_apollo()
 
 if __name__ == '__main__':
 	main()
