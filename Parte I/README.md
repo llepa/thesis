@@ -8,5 +8,13 @@ La seconda cartella (_simulink_) contiene al suo interno:
 ** car - per avviare la simulazione del modello della macchina con cambio automatico;
 ** apollo - per avviare la simulazione del modello dell'Apollo 11.
 
-* _MATLAB_, la cartella che contiene i modelli Simulink/Matlab.
-* _ml.py_, script python che carica tutte le librerie necessarie per poter interagire con Matlab e Simulink, si connette con Matlab, carica il modello desiderato, esegue una simulazione del modello senza introduzione di rumore, e mostra l'output della simulazione attraverso un grafico. Gli stessi passaggi sono poi eseguiti introducendo rumore nel sistema.
+* _MATLAB_, la cartella che contiene i modelli Simulink/Matlab. Di seguito i modelli dei duei sistemi.
+
+<img width="1575" alt="Screenshot 2021-10-15 at 15 19 28" src="https://user-images.githubusercontent.com/51917777/137493430-130a0949-228f-4b97-ac37-c1de00543233.png">
+
+* _ml.py_, script python che carica tutte le librerie necessarie per poter interagire con Matlab e Simulink, si connette con Matlab, carica il modello desiderato, esegue una simulazione del modello senza introduzione di rumore, e mostra l'output della simulazione attraverso un grafico. Gli stessi passaggi sono poi eseguiti introducendo rumore randomico nel sistema.
+
+* _main.py_, script python che come punto di ingresso.
+
+Eseguendo la simulazione sul sistema _car_ e _apollo_ si avrenno in output, rispettivamente, i seguenti grafici.
+
