@@ -1,5 +1,0 @@
-La cartella consegnata contiene al suo interno le due cartelle principali di questo progetto: statistica e simulink.
-
-La prima (statistica) contiene al suo interno il file stats.py che definisce tutte le funzioni riguardanti il calcolo dei momenti statistici del primo e del secondo ordine.
-
-La seconda cartella (simulink) contiene al suo interno
