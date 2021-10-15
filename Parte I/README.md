@@ -23,3 +23,5 @@ La seconda cartella (_simulink_) contiene al suo interno:
 * _main.py_, script python che come punto di ingresso.
 
 * input.json, file di configurazione json che descrive le informazioni necessarie per il caricamento dei modelli e i nomi delle variabli che contengono i dati che si vogliono visualizzare. 
+
+* _markov.py_, script che rappresenta una catena di Markov, eventualmente da modificare, utilizzabile per introdurre rumore nel sistema.
