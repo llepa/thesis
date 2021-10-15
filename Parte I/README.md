@@ -7,6 +7,7 @@ La seconda cartella (_simulink_) contiene al suo interno:
 * _sim_, uno script bash che può essere lanciato da linea di comando per eseguire con più semplicità le simulazioni dei modelli; esso prende in input il nome del modello che si vuole simulare:
   * car - per avviare la simulazione del modello della macchina con cambio automatico;
   * apollo - per avviare la simulazione del modello dell'Apollo 11.
+  (e.g. ./sim apollo)
 
 * _MATLAB_, la cartella che contiene i modelli Simulink/Matlab. Di seguito i modelli dei duei sistemi.
 
