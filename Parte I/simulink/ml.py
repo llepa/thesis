@@ -46,7 +46,7 @@ class SimulinkPlant:
   # MODIFY THIS FUNCTION IN ORDER TO SET TO 0 THE ERROR WHEN introduceNoise IS SET TO False
     def initializeValues(self):
         for value in self.noiseValues:
-            r = random.random() 
+            r = random.random()
             self.setValue(value[1], str(r))
         self.update()
 
@@ -106,8 +106,8 @@ class SimulinkPlant:
     def simulate(self, introduceNoise):
         print('Starting simulation...')
         
-        t = 1                # the simulation stops _ times per second
-        sampleTime = 1         
+        #t = 1                # the simulation stops _ times per second
+        #sampleTime = 1         
         startTime = time.time()
         #self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
 
@@ -162,7 +162,7 @@ class SimulinkPlant:
     # first simulate the model without introducing noise, and then simulate it with noise 
     def fullSimulate(self):
 
-        for b in [False, True]:
+        for b in [True]:
             self.simulate(b)
         s = ''
         while(s != 'y'):
