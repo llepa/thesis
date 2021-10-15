@@ -17,8 +17,8 @@ La seconda cartella (_simulink_) contiene al suo interno:
   _sf_car_using_duration.slx_
   <img width="1575" alt="Screenshot 2021-10-15 at 15 19 28" src="https://user-images.githubusercontent.com/51917777/137493430-130a0949-228f-4b97-ac37-c1de00543233.png">
 
-_aero_dap3dof.slx_
-<img width="1575" alt="Screenshot 2021-10-15 at 15 25 16" src="https://user-images.githubusercontent.com/51917777/137494285-ad349315-619a-4e73-946b-dbb9c4d37aba.png">
+  _aero_dap3dof.slx_
+  <img width="1575" alt="Screenshot 2021-10-15 at 15 25 16" src="https://user-images.githubusercontent.com/51917777/137494285-ad349315-619a-4e73-946b-dbb9c4d37aba.png">
 
 * _main.py_, script python che come punto di ingresso.
 
