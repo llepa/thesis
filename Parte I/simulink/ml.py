@@ -46,7 +46,7 @@ class SimulinkPlant:
   # MODIFY THIS FUNCTION IN ORDER TO SET TO 0 THE ERROR WHEN introduceNoise IS SET TO False
     def initializeValues(self):
         for value in self.noiseValues:
-            r = random.random() / 10 
+            r = random.random() 
             self.setValue(value[1], str(r))
         self.update()
 
@@ -168,8 +168,6 @@ class SimulinkPlant:
         while(s != 'y'):
             s = input('Do you want to end the simulation? [y/n]: ')
         
-        
-
 
     def simulate_car(self):
         # extracts data needed to simulate the model

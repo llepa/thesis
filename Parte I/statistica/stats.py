@@ -35,4 +35,3 @@ kurt = df.loc[['kurtosis']].values
 print(kurt)
 print()
 
-
