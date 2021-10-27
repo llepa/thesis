@@ -162,7 +162,7 @@ class SimulinkPlant:
     # first simulate the model without introducing noise, and then simulate it with noise 
     def fullSimulate(self):
 
-        for b in [True]:
+        for b in [False, True]:
             self.simulate(b)
         s = ''
         while(s != 'y'):
