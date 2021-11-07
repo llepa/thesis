@@ -6,10 +6,13 @@
             "output": [
                 {
                     "values": ["speed.signals.values", "gear.signals.values", "brake.signals.values", "throttle.signals.values", "revs.signals.values", "transmission.signals.values"],
-                    "timestamps": ["speed.time", "gear.time", "brake.time", "throttle.time", "revs.time", "transmission.time"]
+                    "timestamps": ["speed.time", "gear.time", "brake.time", "throttle.time", "revs.time", "transmission.time"],
+                    "names": ["speed", "gear", "brake", "throttle", "revs", "transmission_speed"]
                 }
             ],
-            "noiseValues": [["throttle.signals.values", "throttleNoise"], ["brake.signals.values", "brakeNoise"], ["speed.signals.values", "speedNoise"], ["revs.signals.values", "revsNoise"], ["transmission.signals.values", "transmissionNoise"]]
+            "noiseValues": [["throttle.signals.values", "throttleNoise"], ["brake.signals.values", "brakeNoise"], ["speed.signals.values", "speedNoise"], ["revs.signals.values", "revsNoise"], ["transmission.signals.values", "transmissionNoise"]],
+            "csv": "car.csv",
+            "noisy_csv": "noisy_car.csv"
         },
         {
             "modelName": "aero_dap3dof",
@@ -17,14 +20,17 @@
             "output": [
                 {
                     "values": ["yaw.signals.values", "pitch.signals.values", "roll.signals.values"], 
-                    "timestamps": ["yaw.time", "pitch.time", "roll.time"]
+                    "timestamps": ["yaw.time", "pitch.time", "roll.time"],
+                    "names": ["yaw", "pitch", "roll"]
                 },
                 {
                     "values": ["attitude.signals.values"],
                     "timestamps": ["attitude.time"]
                 }
             ],
-            "noiseValues": [["yaw.signals.values", "yawNoise"], ["pitch.signals.values", "pitchNoise"], ["roll.signals.values", "rollNoise"], ["attitude.signals.values", "attitudeNoise"]]
+            "noiseValues": [["yaw.signals.values", "yawNoise"], ["pitch.signals.values", "pitchNoise"], ["roll.signals.values", "rollNoise"], ["attitude.signals.values", "attitudeNoise"]],
+            "csv": "apollo.csv",
+            "noisy_csv": "noisy_apollo.csv"
     }
     ]
 

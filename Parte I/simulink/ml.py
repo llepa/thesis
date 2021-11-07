@@ -5,6 +5,8 @@ import numpy as np
 import markov
 import json
 import random
+import sys
+import pandas as pd
 
 class SimulinkPlant:
 
@@ -12,14 +14,20 @@ class SimulinkPlant:
         f = open(json_file, 'r')
         self.in_j = json.load(f)
         self.models = self.in_j["models"]
-
+        
 
     def extract_data(self, model):
         self.modelName = self.models[model]["modelName"]
         self.modelPath = self.models[model]["modelPath"]
         self.noiseValues = self.models[model]["noiseValues"]
         self.output = self.models[model]["output"]
+        self.csv = self.models[model]["csv"]
+        self.noisy_csv = self.models[model]["noisy_csv"]
 
+        self.names = list()
+        for d in self.output:
+            self.names += d["names"]
+        self.csv_data = pd.DataFrame(columns=self.names)
 
     def connectToMatlab(self):
         # Starting and connecting to Matlab
@@ -85,7 +93,7 @@ class SimulinkPlant:
         for i in range(len(plot_values["values"])):
             graphString += plot_values["timestamps"][i] + ','
             graphString += plot_values["values"][i] + ','
-            legendString += "\'" + plot_values["values"][i] + "\',"
+            legendString += "\'" + plot_values["names"][i] + "\',"
         graphString = graphString[0: len(graphString)-1]
         legendString = legendString[0: len(legendString)-1]
         self.eng.eval('subplot(' + str(n_plots) + ',1,' + str(pos) + ')')
@@ -105,64 +113,43 @@ class SimulinkPlant:
 
     def simulate(self, introduceNoise):
         print('Starting simulation...')
-        
-        #t = 1                # the simulation stops _ times per second
-        #sampleTime = 1         
         startTime = time.time()
-        #self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
 
         #self.initializeValues()
 
-        if (introduceNoise):
-            self.initializeValues()
-            self.directSimulate()
-            '''
-            self.eng.set_param(self.handle, 'SimulationCommand', 'start', 'SimulationCommand', 'pause', nargout=0)
-            #t += 1
-            while (self.eng.get_param(self.handle, 'SimulationStatus') != ('stopped' or 'terminating')):     
-                if (not t % sampleTime):
-                    for value in self.noiseValues:
-                        #nominalVal = np.array(self.getLastValue(value[0]))[-1]
-                        #nominalVal.astype(float)
-                        r = random.random() - 0.5     # based just on a random value but can be implemented in a more complex way
-                        self.setValue(value[1], str(r))
-                        self.eng.set_param(self.handle, 'SimulationCommand', 'update', nargout=0)
-                
-                else:
-                    for value in self.noiseValues:
-                        self.setValue(value[1], str(0))
-                
-                t += 1
-                self.eng.set_param(self.handle, 'SimulationCommand', 'continue', 'SimulationCommand', 'pause', nargout=0) 
-                '''
-        else:
-            self.directSimulate()
+        #if (introduceNoise):
+            # self.initializeValues()
+        self.directSimulate()
+       
+        #else:
+            #self.directSimulate()
                
         print("Simulation time: " + str(time.time() - startTime) + " seconds")
 
-        '''
-        if (introduceNoise):
-            print("Number of steps taken: " + str(t))
-            # DA RIVEDERE
-            print("Sample time: " + str(12 / t))
-        
-        # interested simulation values are saved in a dictionary
-        for i in range(len(self.output)):
-            self.out[self.output]
-        
-        self.out[self.outTS] = self.getValue(self.outTS)
+        #self.out[self.outTS] = self.getValue(self.outTS)
 
-        for value in self.output:
-            self.out[value] = self.getValue(value)
-        '''
-
+        for out in self.output:
+            for i in range(len(out["values"])):
+                self.csv_data[out["names"][i]] = self.getValue(out["values"][i])
+                # self.csv_data[self.names[i]] = pd.Series(self.getValue(self.output[i]))
+        
         self.plotAll()
+        print(self.csv_data)
+
+
+    def write_csv(self):
+        if (self.noisy):
+            file_name = self.noisy_csv
+        else:
+            file_name = self.csv
+        self.csv_data.to_csv(file_name, mode='a')
 
 
     # first simulate the model without introducing noise, and then simulate it with noise 
     def fullSimulate(self):
 
-        for b in [False, True]:
+        for b in [False]:
+            self.noisy = False
             self.simulate(b)
         s = ''
         while(s != 'y'):
@@ -176,6 +163,8 @@ class SimulinkPlant:
         self.connectToMatlab()
         # run the simulation
         self.fullSimulate()
+        # save output values in csv format file
+        self.write_csv()
         # end the simulation, then the program
         self.disconnect()
 
@@ -189,3 +178,6 @@ class SimulinkPlant:
         self.fullSimulate()
         # end the simulation, then the program
         self.disconnect()
+
+sm = SimulinkPlant('input.json')
+sm.simulate_car()
