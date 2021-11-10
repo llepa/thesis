@@ -1,5 +1,0 @@
-if [ "$1" == car -o "$1" == apollo ]; then
-    python main.py "$1"
-else
-    echo "$0" Error: model does not exist
-fi
