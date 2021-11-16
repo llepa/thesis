@@ -1,0 +1,45 @@
+{   
+    "models": [
+        {
+            "model_name": "sf_car_using_duration",
+            "model_path": "./MATLAB/Examples/R2021b/stateflow/AutomaticTransmissionUsingDurationOperatorExample/sf_car_using_duration",
+            "output": [
+                {
+                    "values": ["throttle", "brake", "transmission", "speed", "noisy_transmission", "noisy_speed"],
+                    "plot": ["throttle", "brake", "noisy_transmission", "noisy_speed"],
+                    "residual": [["transmission", "noisy_transmission", "transmission"], ["speed", "noisy_speed", "speed"]]
+                }               
+            ],
+            "variance": [["transmission_var", 390], ["speed_var", 100]],
+            "variance_tuples": [["transmission", "noisy_transmission", 400, 10, "transmission_var", [80, 90]], ["speed", "noisy_speed", 100, 2, "speed_var", [90, 95]]],
+            "sensor_ID": {"transmission": 1, "speed": 2},
+            "csv": "car.csv",
+            "noisy_csv": "noisy_car.csv",
+            "stats_csv": "stats_car.csv",
+            "noisy_stats_csv": "noisy_stats_car.csv",
+            "model_directory": "../car/model",
+            "data_directory": "../car/data", 
+            "residual_csv": "residual_car.csv"
+        },
+        {
+            "modelName": "aero_dap3dof",
+            "modelPath": "./MATLAB/Examples/R2021a/simulink_aerospace/DevelopingTheApolloLunarModuleDigitalAutopilotExample/aero_dap3dof",
+            "output": [
+                {
+                    "values":["yaw", "pitch", "roll"]
+                },
+                {
+                    "values": ["attitude1", "attitude2", "attitude3"]
+                }
+            ],
+            "variance": [],
+            "csv": "apollo.csv",
+            "noisy_csv": "noisy_apollo.csv",
+            "stats_csv": "stats_apollo.csv",
+            "noisy_stats_csv": "noisy_stats_apollo.csv",
+            "model_directory": "../apollo/model",
+            "data_directory": "../apollo/data"
+    }
+    ]
+
+}

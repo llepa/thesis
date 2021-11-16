@@ -1,0 +1,3 @@
+sensor_residual,mean,variance,std_dev,skewness,kurtosis
+transmission,,,,,
+speed,,,,,

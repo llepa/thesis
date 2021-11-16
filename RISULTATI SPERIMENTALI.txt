@@ -1,0 +1,147 @@
+RISULTATI SPERIMENTALI
+
+Different data chunk size and accuracy of the classifier. This experiment is to establish a trade off between classifier accuracy and amount of data required to make a classification decision.
+
+1. CHUNK_SIZE = 5
+
+	Accuracy 0.816
+	              precision    recall  f1-score   support
+
+	transmission      0.879     0.731     0.798      2978
+	       speed      0.772     0.900     0.831      3016
+
+	    accuracy                          0.816      5994
+	   macro avg      0.825     0.816     0.815      5994
+	weighted avg      0.825     0.816     0.815      5994
+
+
+2. CHUNK_SIZE = 10
+
+	Accuracy 0.927
+	              precision    recall  f1-score   support
+
+	transmission      0.946     0.904     0.925      1493
+	       speed      0.909     0.949     0.928      1504
+
+	    accuracy                          0.927      2997
+	   macro avg      0.927     0.927     0.927      2997
+	weighted avg      0.927     0.927     0.927      2997
+
+
+3. CHUNK_SIZE = 15
+
+	Accuracy 0.952
+	              precision    recall  f1-score   support
+
+	transmission      0.960     0.940     0.950       972
+	       speed      0.945     0.963     0.954      1026
+
+	    accuracy                          0.952      1998
+	   macro avg      0.952     0.952     0.952      1998
+	weighted avg      0.952     0.952     0.952      1998
+
+
+4. CHUNK_SIZE = 20
+
+	Accuracy 0.978
+	              precision    recall  f1-score   support
+
+	transmission      0.978     0.977     0.978       745
+	       speed      0.977     0.979     0.978       754
+
+	    accuracy                          0.978      1499
+	   macro avg      0.978     0.978     0.978      1499
+	weighted avg      0.978     0.978     0.978      1499
+
+
+5. CHUNK_SIZE = 25
+
+	Accuracy 0.990
+	              precision    recall  f1-score   support
+
+	transmission      0.992     0.988     0.990       602
+	       speed      0.988     0.992     0.990       597
+
+	    accuracy                          0.990      1199
+	   macro avg      0.990     0.990     0.990      1199
+	weighted avg      0.990     0.990     0.990      1199
+
+
+6. CHUNK_SIZE = 30
+
+	Accuracy 0.994
+	              precision    recall  f1-score   support
+
+	transmission      0.996     0.992     0.994       490
+	       speed      0.992     0.996     0.994       509
+
+	    accuracy                          0.994       999
+	   macro avg      0.994     0.994     0.994       999
+	weighted avg      0.994     0.994     0.994       999
+
+
+7. CHUNK_SIZE = 35
+
+	Accuracy 0.998
+	              precision    recall  f1-score   support
+
+	transmission      1.000     0.995     0.998       429
+	       speed      0.995     1.000     0.998       427
+
+	    accuracy                          0.998       856
+	   macro avg      0.998     0.998     0.998       856
+	weighted avg      0.998     0.998     0.998       856
+
+
+8. CHUNK_SIZE = 40
+
+	Accuracy 0.999
+	              precision    recall  f1-score   support
+
+	transmission      0.997     1.000     0.999       365
+	       speed      1.000     0.997     0.999       385
+
+	    accuracy                          0.999       750
+	   macro avg      0.999     0.999     0.999       750
+	weighted avg      0.999     0.999     0.999       750
+
+
+9. CHUNK_SIZE = 45
+
+	Accuracy 1.000
+	              precision    recall  f1-score   support
+
+	transmission      1.000     1.000     1.000       351
+	       speed      1.000     1.000     1.000       315
+
+	    accuracy                          1.000       666
+	   macro avg      1.000     1.000     1.000       666
+	weighted avg      1.000     1.000     1.000       666
+
+
+10. CHUNK_SIZE = 50
+
+	Accuracy 0.997
+	              precision    recall  f1-score   support
+
+	transmission      1.000     0.993     0.997       306
+	       speed      0.993     1.000     0.997       294
+
+	    accuracy                          0.997       600
+	   macro avg      0.997     0.997     0.997       600
+	weighted avg      0.997     0.997     0.997       600
+
+
+11. CHUNK_SIZE = 55
+
+	Accuracy 1.000
+	              precision    recall  f1-score   support
+
+	transmission      1.000     1.000     1.000       273
+	       speed      1.000     1.000     1.000       272
+
+	    accuracy                          1.000       545
+	   macro avg      1.000     1.000     1.000       545
+	weighted avg      1.000     1.000     1.000       545
+
+
