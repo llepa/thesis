@@ -15,6 +15,7 @@ from sklearn.metrics import classification_report
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.svm import OneClassSVM
 import warnings
+from sklearn.model_selection import ShuffleSplit, cross_val_score
 
 
 
@@ -22,7 +23,7 @@ import warnings
 SIMULATION_TIME = 1800
 READINGS_PER_SECOND = 25
 TOTAL_READINGS = SIMULATION_TIME * READINGS_PER_SECOND
-CHUNK_SIZE_CAR = int(math.floor(TOTAL_READINGS / 2000))
+CHUNK_SIZE_CAR = 25
 CHUNK_SIZE_APOLLO = 0
 
 class SimulinkPlant:
@@ -186,7 +187,7 @@ class SimulinkPlant:
         self.directSimulate()
         #self.eng.set_param(self.model_name, 'SimulationCommand', 'WriteDataLogs', nargout=0);
 
-        print("Simulation time: " + str(time.time() - startTime) + " seconds")
+        print("Simulation ended in " + str(time.time() - startTime) + " seconds")
 
         # self.out[self.outTS] = self.get_value(self.outTS)
 
@@ -267,6 +268,7 @@ class SimulinkPlant:
 
 
     def split_residuals(self, size=0, seek=False):
+        print("Splitting residuals...")
         i = 0
         X_temp = []
         y_temp = []
@@ -279,6 +281,8 @@ class SimulinkPlant:
                 chunk_size = CHUNK_SIZE_CAR
             elif (self.model == 1):
                 chunk_size = CHUNK_SIZE_APOLLO
+        
+        print("Chunk size: " + str(chunk_size))
 
         for sensor in self.residual_df.columns:
             target_list.append(sensor)
@@ -302,9 +306,11 @@ class SimulinkPlant:
         self.DB['target_names'] = np.array(target_list)
         
         print(self.DB)
+        print("Residual splitted")
 
 
     def fit_and_predict(self):
+        print("Starting fitting procedure...\n")
         model = svm.SVC(kernel='linear', C=1)
         X_all = self.DB['data']
         y_all = self.DB['target']
@@ -319,11 +325,30 @@ class SimulinkPlant:
         print(classification_report(y_test, y_pred, labels=None, target_names=class_names, digits=3))
 
         # clf = OneClassSVM(gamma='auto').fit(X_all, y_all)
-        # print(clf.predict(X_all))
-        # xnew = np.array([1000, 1000, 1000, 1000, 1000])
-        # xnew = xnew.reshape(1,-1)
+        # xnew1 = np.array([30, 1000, 31, 40, 8])
+        # xnew2 = np.array([2.38723733e+00, 8.50546536e+01, 9.22250799e+00, 8.47817817e-01, 1.92842900e+00])
+        # # xnew = xnew.reshape(1,-1)
+        # xnew3 = np.array([-2.38575578e+00, 8.55363083e+01, 9.24858413e+00, 7.11980226e-01, 1.64921218e+00])
+        # print(clf.predict([xnew1, xnew2, xnew3]))
+
         # ynew = model.predict(xnew)
         # print("ynew = " + str(ynew))
+        print("Fitting procedure ended")
+
+
+    def k_fold(self):
+        print("Starting cross validation process with increasing number of splits...\n")
+        model = svm.SVC(kernel='linear', C=1)
+        X_all = self.DB['data']
+        y_all = self.DB['target']
+        for i in range(2, 16):
+            print("Splits: " + str(i))
+            cv = ShuffleSplit(n_splits=i, test_size=0.5, random_state=15)
+            scores = cross_val_score(model, X_all, y_all, cv=cv)
+            print(np.average(scores))
+            print()
+        
+        print("Cross validation process ended")
 
 
     def seek_chunk_size(self):
@@ -420,6 +445,8 @@ class SimulinkPlant:
 
         self.fit_and_predict()
 
+        self.k_fold()
+
         # DA RIVEDERE
         # calculate mse for speed and transmission
         # print("MSE for speed:")
@@ -451,15 +478,73 @@ class SimulinkPlant:
 
 
     def simulate_apollo(self, noisy):
+
         # extracts data needed to simulate the model
         self.extract_simulation_data(1)
-        
-        # load matlab and load the desired model 
-        self.connect_to_Matlab()
-        
 
+        os.chdir(self.model_directory)
+
+        # load matlab and load the desired model 
+        if (not self.connected):
+            self.connect_to_Matlab()
+        
+        if (noisy):
+            self.noisy = True
+            self.set_var()
+        else:
+            self.noisy = False
+
+        # run the simulation
+        self.simulate()
+
+        os.chdir(self.base_path)
+
+        # create data structures for model data and stats storage
+        self.create_data_structures()
+
+        # extract data from model and save it in csv format file
+        self.extract_data()
+        # self.write_data()
+
+        # plot values
+        # self.plotAll()
+
+        # calculate stats and save it in csv format file
+        # self.residual_residual_stats()
+        self.write_stats()
+
+        self.split_residuals()
+
+        self.fit_and_predict()
+
+        # DA RIVEDERE
+        # calculate mse for speed and transmission
+        # print("MSE for speed:")
+        # print(100 - my_stats.mse(self.csv_data['speed'], self.csv_data['noisy_speed']))
+        # print("MSE for transmissione speed;")
+        # print(100 - my_stats.mse(self.csv_data['transmission'], self.csv_data['noisy_transmission']))
+        # print()
+
+        # print("Correlation:")
+        # print(self.corr(self.csv_data))
+        
         # end the simulation, then the program
         self.disconnect()
+
+
+    def seek_var_apollo(self):
+    
+        self.extract_simulation_data(1)
+        self.create_data_structures()
+        os.chdir(self.model_directory)
+        self.connect_to_Matlab()
+
+        for cup in self.variance_tuples:
+            var = self.seek_var(cup[2], cup[0], cup[1], cup[5], cup[3], cup[4])
+            print("BEST VARIANCE FOR " + cup[0] + ": " + str(var))
+            print()
+
+        os.chdir(self.base_path)
 
 # sm = SimulinkPlant('input.json')
 # sm.simulate_car(False)

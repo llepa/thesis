@@ -22,24 +22,47 @@
             "residual_csv": "residual_car.csv"
         },
         {
-            "modelName": "aero_dap3dof",
-            "modelPath": "./MATLAB/Examples/R2021a/simulink_aerospace/DevelopingTheApolloLunarModuleDigitalAutopilotExample/aero_dap3dof",
+            "model_name": "aero_dap3dof",
+            "model_path": "./MATLAB/Examples/R2021a/simulink_aerospace/DevelopingTheApolloLunarModuleDigitalAutopilotExample/aero_dap3dof",
             "output": [
                 {
-                    "values":["yaw", "pitch", "roll"]
-                },
-                {
-                    "values": ["attitude1", "attitude2", "attitude3"]
+                    "values": ["attitude1", "attitude2", "attitude3", "noisy_attitude1"],
+                    "plot": ["noisy_attitude1", "noisy_attitude2", "noisy_attitude3"],
+                    "residual": [["attitude1", "noisy_attitude1", "attitude1"]]
                 }
             ],
-            "variance": [],
+            "variance": [["attitude_var", 0.0000001]],
+            "variance_tuples": [["attitude1", "noisy_attitude1", 0.0000003, 0.00000001, "attitude_var", [94, 96]]],
+            "sensor_ID": {"attitude": 1},
             "csv": "apollo.csv",
             "noisy_csv": "noisy_apollo.csv",
             "stats_csv": "stats_apollo.csv",
             "noisy_stats_csv": "noisy_stats_apollo.csv",
             "model_directory": "../apollo/model",
-            "data_directory": "../apollo/data"
-    }
+            "data_directory": "../apollo/data",
+            "residual_csv": "residual_apollo.csv"
+        },
+        {
+            "model_name": "sldemo_auto_climate_elec",
+            "model_path": "",
+            "output": [
+                {
+                    "values": ["external", "noisy_external", "tcabin", "noisy_tcabin", "tout", "noisy_tout", "ac_temp", "noisy_ac_temp"],
+                    "plot": [],
+                    "residual": [["external", "noisy_external", "external"], ["tcabin", "noisy_tcabin", "tcabin"], ["tout", "noisy_tout", "tout"], ["ac_temp", "noisy_ac_temp", "ac_temp"]]
+                }
+            ],
+            "variance": [["external_var", 1], ["tcabin_var", 1], ["tout_var", 1], ["ac_temp_var", 1]],
+            "variance_tuples": [["external", "noisy_external", 1, 0.1, "external_var", [92, 93]], ["tcabin", "noisy_tcabin", 1, 0.1,"tcabin_var", [93, 94]], ["tout", "noisy_tout", 1, 0.1, "tout_var", [94, 95]], ["ac_temp", "noisy_ac_temp", 1, 0.1, "ac_temp_var", [96, 97]]],
+            "sensor_ID": {"external": 1, "tcabin": 2, "tout": 3, "ac_temp": 4},
+            "csv": "climate.csv",
+            "noisy_csv": "noisy_climate.csv",
+            "stats_csv": "stats_climate.csv",
+            "noisy_stats_csv": "noisy_climate.csv",
+            "model_directory": "../climate/model",
+            "data_directory": "../climate/data",
+            "residual_csv": "residual_climate.csv"
+        }
     ]
 
 }
