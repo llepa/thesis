@@ -25,6 +25,7 @@ READINGS_PER_SECOND = 25
 TOTAL_READINGS = SIMULATION_TIME * READINGS_PER_SECOND
 CHUNK_SIZE_CAR = 25
 CHUNK_SIZE_APOLLO = 0
+CHUNK_SIZE_CLIMATE = 55
 
 class SimulinkPlant:
 
@@ -281,6 +282,8 @@ class SimulinkPlant:
                 chunk_size = CHUNK_SIZE_CAR
             elif (self.model == 1):
                 chunk_size = CHUNK_SIZE_APOLLO
+            elif (self.model == 2):
+                chunk_size = CHUNK_SIZE_CLIMATE
         
         print("Chunk size: " + str(chunk_size))
 
@@ -583,11 +586,11 @@ class SimulinkPlant:
         # self.residual_residual_stats()
         self.write_stats()
 
-        # self.split_residuals()
+        self.split_residuals()
 
-        # self.fit_and_predict()
+        self.fit_and_predict()
 
-        # self.k_fold()
+        self.k_fold()
 
         # DA RIVEDERE
         # calculate mse for speed and transmission

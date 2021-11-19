@@ -146,6 +146,52 @@ Different data chunk size and accuracy of the classifier. This experiment is don
 	   macro avg      1.000     1.000     1.000       545
 	weighted avg      1.000     1.000     1.000       545
 
+
+K-FOLD CROSS VALIDATION
+
+Splits: 2
+0.9886111111111111
+
+Splits: 3
+0.9890740740740741
+
+Splits: 4
+0.9895833333333334
+
+Splits: 5
+0.9895555555555555
+
+Splits: 6
+0.9899074074074073
+
+Splits: 7
+0.9897619047619047
+
+Splits: 8
+0.9898611111111111
+
+Splits: 9
+0.9898765432098765
+
+Splits: 10
+0.9901111111111112
+
+Splits: 11
+0.9905555555555555
+
+Splits: 12
+0.9899999999999999
+
+Splits: 13
+0.9898290598290598
+
+Splits: 14
+0.9898015873015872
+
+Splits: 15
+0.9896666666666666
+
+
 ---------------- CLIMATE -------------------------------
 
 
@@ -424,3 +470,46 @@ Different data chunk size and accuracy of the classifier. This experiment is don
 	   macro avg      0.996     0.996     0.996      1014
 	weighted avg      0.996     0.996     0.996      1014
 
+K-FOLD CROSS VALIDATION
+
+Splits: 2
+0.9871794871794872
+
+Splits: 3
+0.9877211989888046
+
+Splits: 4
+0.9872697724810401
+
+Splits: 5
+0.98757674250632
+
+Splits: 6
+0.9874804381846637
+
+Splits: 7
+0.9876180157870299
+
+Splits: 8
+0.987856626941134
+
+Splits: 9
+0.987801452590185
+
+Splits: 10
+0.9879378837125316
+
+Splits: 11
+0.9878196920450442
+
+Splits: 12
+0.9877813891898399
+
+Splits: 13
+0.9876656388032337
+
+Splits: 14
+0.9876438115874737
+
+Splits: 15
+0.987793427230047
