@@ -7,11 +7,17 @@
                 {
                     "values": ["throttle", "brake", "transmission", "speed", "noisy_transmission", "noisy_speed"],
                     "plot": ["throttle", "brake", "noisy_transmission", "noisy_speed"],
-                    "residual": [["transmission", "noisy_transmission", "transmission"], ["speed", "noisy_speed", "speed"]]
+                    "residual": [
+                                    ["transmission", "noisy_transmission", "transmission"], 
+                                    ["speed", "noisy_speed", "speed"]
+                                ]
                 }               
             ],
             "variance": [["transmission_var", 390], ["speed_var", 100]],
-            "variance_tuples": [["transmission", "noisy_transmission", 400, 10, "transmission_var", [80, 90]], ["speed", "noisy_speed", 100, 2, "speed_var", [90, 95]]],
+            "variance_tuples": [
+                                    ["transmission", "noisy_transmission", 400, 10, "transmission_var", [80, 90]], 
+                                    ["speed", "noisy_speed", 100, 2, "speed_var", [90, 95]]
+                                ],
             "sensor_ID": {"transmission": 1, "speed": 2},
             "csv": "car.csv",
             "noisy_csv": "noisy_car.csv",
@@ -47,14 +53,22 @@
             "model_path": "",
             "output": [
                 {
-                    "values": ["external", "noisy_external", "tcabin", "noisy_tcabin", "tout", "noisy_tout", "ac_temp", "noisy_ac_temp"],
+                    "values": ["tcabin", "noisy_tcabin", "t_out", "noisy_t_out", "ac_temp", "noisy_ac_temp"],
                     "plot": [],
-                    "residual": [["external", "noisy_external", "external"], ["tcabin", "noisy_tcabin", "tcabin"], ["tout", "noisy_tout", "tout"], ["ac_temp", "noisy_ac_temp", "ac_temp"]]
+                    "residual": [ 
+                                    ["tcabin", "noisy_tcabin", "tcabin"], 
+                                    ["t_out", "noisy_t_out", "t_out"], 
+                                    ["ac_temp", "noisy_ac_temp", "ac_temp"]
+                                ]
                 }
             ],
-            "variance": [["external_var", 1], ["tcabin_var", 1], ["tout_var", 1], ["ac_temp_var", 1]],
-            "variance_tuples": [["external", "noisy_external", 1, 0.1, "external_var", [92, 93]], ["tcabin", "noisy_tcabin", 1, 0.1,"tcabin_var", [93, 94]], ["tout", "noisy_tout", 1, 0.1, "tout_var", [94, 95]], ["ac_temp", "noisy_ac_temp", 1, 0.1, "ac_temp_var", [96, 97]]],
-            "sensor_ID": {"external": 1, "tcabin": 2, "tout": 3, "ac_temp": 4},
+            "variance": [["ClimateControlSystem/tcabin_var", 9.2], ["ClimateControlSystem/t_out_var", 4.1], ["ClimateControlSystem/ac_temp_var", 1]],
+            "variance_tuples": [ 
+                                    ["tcabin", "noisy_tcabin", 5, 0.2, "ClimateControlSystem/tcabin_var", [96, 97]], 
+                                    ["t_out", "noisy_t_out", 2, 0.1, "ClimateControlSystem/t_out_var", [97, 98]], 
+                                    ["ac_temp", "noisy_ac_temp", 1, 0.1, "ClimateControlSystem/ac_temp_var", [99, 100]]
+                                ],
+            "sensor_ID": {"tcabin": 2, "t_out": 3, "ac_temp": 4},
             "csv": "climate.csv",
             "noisy_csv": "noisy_climate.csv",
             "stats_csv": "stats_climate.csv",

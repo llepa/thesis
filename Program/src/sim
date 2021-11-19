@@ -1,4 +1,4 @@
-if [ "$1" == car -o "$1" == apollo ]; then
+if [ "$1" == car -o "$1" == apollo -o "$1" == climate ]; then
     if [ "$2" == noise -o "$2" == nonoise -o "$2" == variance -o "$2" == chunk ]; then
         python main.py "$1" "$2"
     else 

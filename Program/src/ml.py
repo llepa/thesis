@@ -351,9 +351,9 @@ class SimulinkPlant:
         print("Cross validation process ended")
 
 
-    def seek_chunk_size(self):
+    def seek_chunk_size(self, model):
 
-        self.extract_simulation_data(0)
+        self.extract_simulation_data(model)
         os.chdir(self.model_directory)
         self.connect_to_Matlab()
         self.simulate()
@@ -361,7 +361,7 @@ class SimulinkPlant:
         self.create_data_structures()
         self.extract_data()
 
-        for size in range(5, 100, 5):    
+        for size in range(100, 105, 5):    
             print("Seeking performances with chunk size: " + str(size))
             self.split_residuals(size, True)
             self.fit_and_predict()
@@ -468,7 +468,7 @@ class SimulinkPlant:
         self.create_data_structures()
         os.chdir(self.model_directory)
         self.connect_to_Matlab()
-        # [["transmission", "noisy_transmission", 500, 10, "transmission_var", [80, 90]], ["speed", "noisy_speed", 100, 2, "speed_var"], [90, 95]]
+
         for cup in self.variance_tuples:
             var = self.seek_var(cup[2], cup[0], cup[1], cup[5], cup[3], cup[4])
             print("BEST VARIANCE FOR " + cup[0] + ": " + str(var))
@@ -545,6 +545,78 @@ class SimulinkPlant:
             print()
 
         os.chdir(self.base_path)
+
+
+    def simulate_climate(self, noisy):
+
+        # extracts data needed to simulate the model
+        self.extract_simulation_data(2)
+
+        os.chdir(self.model_directory)
+
+        # load matlab and load the desired model 
+        if (not self.connected):
+            self.connect_to_Matlab()
+        
+        if (noisy):
+            self.noisy = True
+            self.set_var()
+        else:
+            self.noisy = False
+
+        # run the simulation
+        self.simulate()
+
+        os.chdir(self.base_path)
+
+        # create data structures for model data and stats storage
+        self.create_data_structures()
+
+        # extract data from model and save it in csv format file
+        self.extract_data()
+        self.write_data()
+
+        # plot values
+        # self.plotAll()
+
+        # calculate stats and save it in csv format file
+        # self.residual_residual_stats()
+        self.write_stats()
+
+        # self.split_residuals()
+
+        # self.fit_and_predict()
+
+        # self.k_fold()
+
+        # DA RIVEDERE
+        # calculate mse for speed and transmission
+        # print("MSE for speed:")
+        # print(100 - my_stats.mse(self.csv_data['speed'], self.csv_data['noisy_speed']))
+        # print("MSE for transmissione speed;")
+        # print(100 - my_stats.mse(self.csv_data['transmission'], self.csv_data['noisy_transmission']))
+        # print()
+
+        # print("Correlation:")
+        # print(self.corr(self.csv_data))
+        
+        # end the simulation, then the program
+        self.disconnect()
+
+    def seek_var_climate(self):
+    
+        self.extract_simulation_data(2)
+        self.create_data_structures()
+        os.chdir(self.model_directory)
+        self.connect_to_Matlab()
+
+        for cup in self.variance_tuples:
+            var = self.seek_var(cup[2], cup[0], cup[1], cup[5], cup[3], cup[4])
+            print("BEST VARIANCE FOR " + cup[0] + ": " + str(var))
+            print()
+
+        os.chdir(self.base_path)
+
 
 # sm = SimulinkPlant('input.json')
 # sm.simulate_car(False)

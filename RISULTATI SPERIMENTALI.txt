@@ -1,6 +1,8 @@
 RISULTATI SPERIMENTALI
 
-Different data chunk size and accuracy of the classifier. This experiment is to establish a trade off between classifier accuracy and amount of data required to make a classification decision.
+--------------- CAR -------------------
+
+Different data chunk size and accuracy of the classifier. This experiment is done to establish a trade off between classifier accuracy and amount of data required to make a classification decision.
 
 1. CHUNK_SIZE = 5
 
@@ -144,4 +146,281 @@ Different data chunk size and accuracy of the classifier. This experiment is to 
 	   macro avg      1.000     1.000     1.000       545
 	weighted avg      1.000     1.000     1.000       545
 
+---------------- CLIMATE -------------------------------
+
+
+1. CHUNK_SIZE = 5
+
+	Accuracy 0.690
+	              precision    recall  f1-score   support
+
+	      tcabin      0.785     0.546     0.644      6784
+	       t_out      0.561     0.605     0.582      6723
+	     ac_temp      0.748     0.918     0.825      6782
+
+	    accuracy                          0.690     20289
+	   macro avg      0.698     0.690     0.683     20289
+	weighted avg      0.698     0.690     0.684     20289
+
+
+2. CHUNK SIZE = 10
+
+	Accuracy 0.824
+	              precision    recall  f1-score   support
+
+	      tcabin      0.850     0.730     0.786      3353
+	       t_out      0.723     0.780     0.750      3410
+	     ac_temp      0.906     0.960     0.932      3381
+
+	    accuracy                          0.824     10144
+	   macro avg      0.826     0.824     0.823     10144
+	weighted avg      0.826     0.824     0.823     10144
+
+3. CHUNK SIZE = 15
+
+	Accuracy 0.877
+	              precision    recall  f1-score   support
+
+	      tcabin      0.882     0.800     0.839      2285
+	       t_out      0.793     0.854     0.822      2251
+	     ac_temp      0.963     0.980     0.971      2227
+
+	    accuracy                          0.877      6763
+	   macro avg      0.879     0.878     0.877      6763
+	weighted avg      0.879     0.877     0.877      6763
+
+4. CHUNK SIZE = 20
+
+	Accuracy 0.914
+	              precision    recall  f1-score   support
+
+	      tcabin      0.910     0.853     0.881      1699
+	       t_out      0.855     0.895     0.875      1702
+	     ac_temp      0.979     0.995     0.987      1671
+
+	    accuracy                          0.914      5072
+	   macro avg      0.915     0.914     0.914      5072
+	weighted avg      0.914     0.914     0.914      5072
+
+5. CHUNK SIZE = 25
+
+	Accuracy 0.931
+	              precision    recall  f1-score   support
+
+	      tcabin      0.911     0.897     0.904      1343
+	       t_out      0.894     0.905     0.900      1384
+	     ac_temp      0.990     0.993     0.992      1330
+
+	    accuracy                          0.931      4057
+	   macro avg      0.932     0.932     0.932      4057
+	weighted avg      0.931     0.931     0.931      4057
+
+6. CHUNK SIZE = 30
+	
+	Accuracy 0.955
+	              precision    recall  f1-score   support
+
+	      tcabin      0.940     0.930     0.935      1094
+	       t_out      0.930     0.937     0.933      1126
+	     ac_temp      0.995     0.997     0.996      1161
+
+	    accuracy                          0.955      3381
+	   macro avg      0.955     0.955     0.955      3381
+	weighted avg      0.955     0.955     0.955      3381
+
+
+7. CHUNK SIZE = 35
+
+	Accuracy 0.961
+	              precision    recall  f1-score   support
+
+	      tcabin      0.958     0.927     0.942       960
+	       t_out      0.930     0.956     0.943       980
+	     ac_temp      0.996     0.999     0.997       959
+
+	    accuracy                          0.961      2899
+	   macro avg      0.961     0.961     0.961      2899
+	weighted avg      0.961     0.961     0.961      2899
+
+
+8. CHUNK SIZE = 40
+
+	Accuracy 0.971
+	              precision    recall  f1-score   support
+
+	      tcabin      0.969     0.946     0.957       850
+	       t_out      0.946     0.967     0.956       836
+	     ac_temp      0.998     1.000     0.999       850
+
+	    accuracy                          0.971      2536
+	   macro avg      0.971     0.971     0.971      2536
+	weighted avg      0.971     0.971     0.971      2536
+
+
+9. CHUNK SIZE = 45
+
+	Accuracy 0.977
+	              precision    recall  f1-score   support
+
+	      tcabin      0.976     0.956     0.966       766
+	       t_out      0.957     0.977     0.967       769
+	     ac_temp      1.000     1.000     1.000       719
+
+	    accuracy                          0.977      2254
+	   macro avg      0.978     0.977     0.977      2254
+	weighted avg      0.977     0.977     0.977      2254
+
+
+10. CHUNK SIZE = 50
+
+	Accuracy 0.983
+	              precision    recall  f1-score   support
+
+	      tcabin      0.980     0.967     0.973       663
+	       t_out      0.969     0.981     0.975       701
+	     ac_temp      1.000     1.000     1.000       664
+
+	    accuracy                          0.983      2028
+	   macro avg      0.983     0.983     0.983      2028
+	weighted avg      0.983     0.983     0.983      2028
+
+
+11. CHUNK SIZE = 55
+
+	Accuracy 0.989
+	              precision    recall  f1-score   support
+
+	      tcabin      0.984     0.984     0.984       616
+	       t_out      0.984     0.984     0.984       640
+	     ac_temp      1.000     1.000     1.000       589
+
+	    accuracy                          0.989      1845
+	   macro avg      0.989     0.989     0.989      1845
+	weighted avg      0.989     0.989     0.989      1845
+
+
+12. CHUNK SIZE = 60
+
+	Accuracy 0.992
+	              precision    recall  f1-score   support
+
+	      tcabin      0.991     0.984     0.987       561
+	       t_out      0.985     0.991     0.988       578
+	     ac_temp      1.000     1.000     1.000       552
+
+	    accuracy                          0.992      1691
+	   macro avg      0.992     0.992     0.992      1691
+	weighted avg      0.992     0.992     0.992      1691
+
+
+13. CHUNK SIZE = 65
+
+	Accuracy 0.988
+	              precision    recall  f1-score   support
+
+	      tcabin      0.986     0.979     0.983       518
+	       t_out      0.980     0.985     0.982       534
+	     ac_temp      0.998     1.000     0.999       509
+
+	    accuracy                          0.988      1561
+	   macro avg      0.988     0.988     0.988      1561
+	weighted avg      0.988     0.988     0.988      1561
+
+
+14. CHUNK SIZE = 70
+
+	Accuracy 0.990
+	              precision    recall  f1-score   support
+
+	      tcabin      0.991     0.981     0.986       468
+	       t_out      0.983     0.990     0.986       514
+	     ac_temp      0.998     1.000     0.999       467
+
+	    accuracy                          0.990      1449
+	   macro avg      0.991     0.990     0.990      1449
+	weighted avg      0.990     0.990     0.990      1449
+
+
+15. CHUNK SIZE = 75
+
+	Accuracy 0.992
+	              precision    recall  f1-score   support
+
+	      tcabin      0.993     0.982     0.987       440
+	       t_out      0.983     0.993     0.988       461
+	     ac_temp      1.000     1.000     1.000       451
+
+	    accuracy                          0.992      1352
+	   macro avg      0.992     0.992     0.992      1352
+	weighted avg      0.992     0.992     0.992      1352
+
+
+16. CHUNK SIZE = 80
+
+	Accuracy 0.997
+	              precision    recall  f1-score   support
+
+	      tcabin      0.998     0.993     0.995       427
+	       t_out      0.993     0.998     0.995       413
+	     ac_temp      1.000     1.000     1.000       428
+
+	    accuracy                          0.997      1268
+	   macro avg      0.997     0.997     0.997      1268
+	weighted avg      0.997     0.997     0.997      1268
+
+
+17. CHUNK SIZE = 85
+
+	Accuracy 0.998
+	              precision    recall  f1-score   support
+
+	      tcabin      0.995     1.000     0.997       399
+	       t_out      1.000     0.995     0.998       405
+	     ac_temp      1.000     1.000     1.000       389
+
+	    accuracy                          0.998      1193
+	   macro avg      0.998     0.998     0.998      1193
+	weighted avg      0.998     0.998     0.998      1193
+
+
+18. CHUNK SIZE = 90
+
+	Accuracy 0.997
+	              precision    recall  f1-score   support
+
+	      tcabin      0.997     0.995     0.996       380
+	       t_out      0.995     0.997     0.996       383
+	     ac_temp      1.000     1.000     1.000       364
+
+	    accuracy                          0.997      1127
+	   macro avg      0.997     0.997     0.997      1127
+	weighted avg      0.997     0.997     0.997      1127
+
+
+19. CHUNK SIZE = 95
+
+	Accuracy 0.999
+	              precision    recall  f1-score   support
+
+	      tcabin      1.000     0.997     0.999       365
+	       t_out      0.997     1.000     0.999       354
+	     ac_temp      1.000     1.000     1.000       348
+
+	    accuracy                          0.999      1067
+	   macro avg      0.999     0.999     0.999      1067
+	weighted avg      0.999     0.999     0.999      1067
+
+
+20. CHUNK SIZE = 100
+
+	Accuracy 0.996
+	              precision    recall  f1-score   support
+
+	      tcabin      0.997     0.991     0.994       339
+	       t_out      0.991     0.997     0.994       350
+	     ac_temp      1.000     1.000     1.000       325
+
+	    accuracy                          0.996      1014
+	   macro avg      0.996     0.996     0.996      1014
+	weighted avg      0.996     0.996     0.996      1014
 
