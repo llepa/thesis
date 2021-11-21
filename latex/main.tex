@@ -1,0 +1,139 @@
+% !TeX encoding = UTF-8
+% !TeX program = pdflatex
+% !TeX spellcheck = it_IT
+
+% \documentclass[a4paper, 11pt]{article}
+\documentclass[Lau,binding=0.6cm]{sapthesis}
+
+\usepackage{microtype}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenx}
+
+\usepackage{hyperref}
+\hypersetup{pdftitle={tesi},pdfauthor={Andrei Laurentiu Lepadat}}
+
+\title{Using Sensor and Process Noise Fingerprint to Detect Cyber Attacks in CPS}
+\author{Andrei Laurentiu Lepadat}
+\IDnumber{1677093}
+\course{Informatica}
+\courseorganizer{Facoltà di Ingegneria dell'Informazione, Informatica e Statistica}
+\AcademicYear{2020/2021}
+\copyyear{2021}
+\advisor{Prof. Enrico Tronci}
+\authoremail{lepadat.1677093@studenti.uniroma1.it}
+
+\versiondate{\today}
+
+\begin{document}
+
+\frontmatter
+
+\maketitle
+
+\dedication{Decidere se inserire. Ne vale la pena?}
+
+% ----------------------------------------------------------------------------------------
+
+\tableofcontents
+
+\chapter{Sommario} 
+% Massimo una pagina da scrivere alla fine
+
+% ----------------------------------------------------------------------------------------   
+
+\mainmatter
+
+\chapter{Introduzione} 
+% Scrivere alla fine 
+
+\section{Contesto}
+% Short description of context,  for example:
+% Tutti gli essere vivneti per sopravviver hanno bisogno di alimentarsi.
+% Gli uomini sono essere viventi, e quindi hanno bisogno di alimentarsi.
+
+\section{Motivazioni}
+% Motivation for what we want to do. esempio:
+% Purtroppo la mancanza di una alimentazione adeguata è uno dei problemi più importanti nei paesi sottosviluppati
+
+\section{Contributi}
+% Describe here your contributions, namely the missing items identified in the motivations. esempio:
+% Questo lavoro propone un metodo per generare cibo per tutti gli abitanti dei paesi sottosviluppati ...
+
+\section{Lavori correlati}
+% Describe here the state of the art (e.g., algorithms and tools  available).
+% For each paper/tool explain what you do that is not already available (killing).
+
+\section{Struttura}
+% Give an outline of the thesis structure (one sentence per section)
+
+
+% ----------------------------------------------------------------------------------------
+
+\chapter{Background}
+% Put in this section all the background knowledge needed to understand what you did.
+
+% Parlare di dati di sensori, serie temporali estratti dai sensori, rmse, rumore intrinseco sensori --> residual
+% machine learning model e decision 
+
+Ogni sistema cyber-fisico che si rispetti è dotato di almeno un sensore che ha il compito di misurare una determinata ``qualità'' fisica di interesse per il sistema stesso. 
+I dati che vengono rilevati dai sensori spesso vengono memorizzati localmente e/o in modo remoto e possono essere impiegati,
+come nel lavoro qui presentato, per fini paralleli o trasversali a quelli per cui sono stati installati.
+Una sequenza di dati estratti da sensori ordinata temporalemente viene chiamata \textit{serie temporale} (\textit{time-series} in inglese).
+
+Comunemente i sensori sono imperfetti per costruzione e trasportano intrinsecamente un'incertezza (rumore) che influenza le misurazioni da essi compiute.
+Sia 
+$$
+\bar{y}_{k} = y_{k} + \delta_{k}
+$$
+il valore misurato da un determinato sensore nell'istante di tempo \textit{k}, composto da $y_k$, il valore effettivo in quell'istante della grandezza misurata, più $\delta_k$, il rumore aggiunto.
+
+In un determinato istante di tempo, il valore di ogni sensore del sistema costituisce lo \textit{stato} del sistema.
+La sfida di estrarre il fingerprint dai sensori è data dal fatto che questi stati sono dinamici. 
+Prendendo in considerazione, per esempio, un termometro, se la temperatura dell'ambiente che misura rimane costante nel tempo è facile estrarre
+
+% ----------------------------------------------------------------------------------------
+
+\chapter{Metodi}
+% Describe here the algorithm design from a math perspective. No code here.
+
+% ----------------------------------------------------------------------------------------
+
+\chapter{Implementazione}
+% describe here how you implemented the functionalities described in the methods section.
+% Use pseudo-code or diagrams.
+
+% Parlare del come si è implementato il rumore intrinseco in un modello symulink
+
+% ----------------------------------------------------------------------------------------
+
+\chapter{Risultati sperimentali}
+% describe the experimental results
+
+\section{Obiettivi}
+% describe here the objectives of the experimental activity: test correctness;
+% evaluate computational performances (CPU time and RAM); ....
+
+\section{Configurazione (Setting) (?)}
+% describe experimental setting: hardware used, software used, data used, etc. ....
+
+\section{Casi di studio}
+% describe here the case studies used in the experiments
+
+\section{Correttezza}
+% describe here experiments aimed at showing correctness of your implementation
+% Risultati cross-validation
+
+\section{Valutazione computazionale}
+% describe here experiments aimed at evaluating computational performance (e.g., CPU usage, RMA usage, etc)
+
+\section{Valutazione tecnica}
+% describe here experiments aimed at evaluating your tools wrt their intended use.
+% For example, software to detect adversarial attacks will be evaluated here showing how good (or bad) it is in detecting attcks.
+
+\chapter{Conclusioni}
+% Sum up what you did and outline some possible future developments.
+
+\backmatter
+% Inserire qui referenze e citazioni
+
+\end{document}

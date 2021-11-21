@@ -54,6 +54,7 @@ class SimulinkPlant:
         self.variance_tuples = self.models[model]["variance_tuples"]
         self.residual_csv = self.models[model]["residual_csv"]
         self.sensor_ID = self.models[model]["sensor_ID"]
+        self.dataset_json = self.models[model]["dataset"]
         
 
     def create_data_structures(self):
@@ -268,51 +269,72 @@ class SimulinkPlant:
         return data
 
 
-    def split_residuals(self, size=0, seek=False):
-        print("Splitting residuals...")
-        i = 0
-        X_temp = []
-        y_temp = []
-        target_list = []
-
-        if (seek == True):
-            chunk_size = size
-        else:
-            if (self.model == 0):
-                chunk_size = CHUNK_SIZE_CAR
-            elif (self.model == 1):
-                chunk_size = CHUNK_SIZE_APOLLO
-            elif (self.model == 2):
-                chunk_size = CHUNK_SIZE_CLIMATE
+    def split_residuals(self, size=0, seek=False, recompute=False, attack=False):
         
-        print("Chunk size: " + str(chunk_size))
+        # implementare funzionalità affinché, se il frame dei chunk (senza attacco) è già stato calcolato (cioè il relativo file .csv è presente),
+        # allora importare tali dati senza ricalcolare l'intero frame
+        if (recompute == False and os.path.isfile(self.dataset_json)):
+            print("File containing residuals found, loading...")
+            with open(self.dataset_json, 'r') as jf:
+                self.DB = json.load(jf)
+            #print(self.DB)
+        else:
+            print("Splitting residuals...")
+            start_time = time.time()
+            i = 0
+            X_temp = []
+            y_temp = []
+            target_list = []
 
-        for sensor in self.residual_df.columns:
-            target_list.append(sensor)
-            while (i < len(self.residual_df[sensor])):
-                if (i + 2 * chunk_size > len(self.residual_df[sensor])):
-                    X_temp.append(self.add_feature(self.residual_df[sensor][i: i+chunk_size], sensor))
-                    y_temp.append(self.sensor_ID[sensor])
-                    i += chunk_size * 2
-                else:
-                    if (i + chunk_size > len(self.residual_df[sensor])):
-                        X_temp.append(self.add_feature(self.residual_df[sensor][i:], sensor))
-                        y_temp.append(self.sensor_ID[sensor])
-                    else:
+            if (seek == True):
+                chunk_size = size
+            else:
+                if (self.model == 0):
+                    chunk_size = CHUNK_SIZE_CAR
+                elif (self.model == 1):
+                    chunk_size = CHUNK_SIZE_APOLLO
+                elif (self.model == 2):
+                    chunk_size = CHUNK_SIZE_CLIMATE
+            
+            print("Chunk size: " + str(chunk_size))
+
+            for sensor in self.residual_df.columns:
+                target_list.append(sensor)
+                while (i < len(self.residual_df[sensor])):
+                    if (i + 2 * chunk_size > len(self.residual_df[sensor])):
                         X_temp.append(self.add_feature(self.residual_df[sensor][i: i+chunk_size], sensor))
                         y_temp.append(self.sensor_ID[sensor])
-                    i += chunk_size
-            i = 0
-        
-        self.DB['data'] = np.array(X_temp)
-        self.DB['target'] = np.array(y_temp)
-        self.DB['target_names'] = np.array(target_list)
-        
-        print(self.DB)
-        print("Residual splitted")
+                        i += chunk_size * 2
+                    else:
+                        if (i + chunk_size > len(self.residual_df[sensor])):
+                            X_temp.append(self.add_feature(self.residual_df[sensor][i:], sensor))
+                            y_temp.append(self.sensor_ID[sensor])
+                        else:
+                            X_temp.append(self.add_feature(self.residual_df[sensor][i: i+chunk_size], sensor))
+                            y_temp.append(self.sensor_ID[sensor])
+                        i += chunk_size
+                i = 0
+            
+            self.DB['data'] = X_temp
+            self.DB['target'] = y_temp
+            self.DB['target_names'] = target_list
+
+            # if (seek == False):
+            #     df = pd.DataFrame(columns=['data', 'target'])
+            #     df['data'] = self.DB['data']
+            #     df['target'] = self.DB['target']
+            #     df.to_csv(self.dataset_json, index=False)
+            
+            if (not attack):
+                print("Splitting without attack noise introduction")
+                with open(self.dataset_json, 'w') as f:
+                    json.dump(self.DB, f)
+
+            print("Splitting time: " + str(time.time() - start_time))
+            print("Residual splitted")
 
 
-    def fit_and_predict(self):
+    def fit_model(self):
         print("Starting fitting procedure...\n")
         model = svm.SVC(kernel='linear', C=1)
         X_all = self.DB['data']
@@ -327,7 +349,13 @@ class SimulinkPlant:
         class_names = np.array([str(c) for c in self.DB['target_names']])
         print(classification_report(y_test, y_pred, labels=None, target_names=class_names, digits=3))
 
-        # clf = OneClassSVM(gamma='auto').fit(X_all, y_all)
+        self.clf = OneClassSVM(gamma='auto').fit(X_all, y_all)
+        r = self.clf.predict(X_all)
+        _and = True
+        for b in r:
+            _and = b and _and
+        print(_and)
+        
         # xnew1 = np.array([30, 1000, 31, 40, 8])
         # xnew2 = np.array([2.38723733e+00, 8.50546536e+01, 9.22250799e+00, 8.47817817e-01, 1.92842900e+00])
         # # xnew = xnew.reshape(1,-1)
@@ -336,7 +364,7 @@ class SimulinkPlant:
 
         # ynew = model.predict(xnew)
         # print("ynew = " + str(ynew))
-        print("Fitting procedure ended")
+        print("Fitting procedure completed")
 
 
     def k_fold(self):
@@ -367,7 +395,7 @@ class SimulinkPlant:
         for size in range(100, 105, 5):    
             print("Seeking performances with chunk size: " + str(size))
             self.split_residuals(size, True)
-            self.fit_and_predict()
+            self.fit_model()
             print()
 
 
@@ -408,6 +436,27 @@ class SimulinkPlant:
         return var
 
 
+    def attack_sensor(self, var, value):
+        
+        attack_istant = 100
+        chunk_size = CHUNK_SIZE_CAR
+
+        print("Introducing noise to sensor " + var + " in chunk " + str(int(attack_istant * READINGS_PER_SECOND / CHUNK_SIZE_CAR)) + ", with variance value " + str(value))
+
+        os.chdir(self.model_directory)
+        self.set_spec_var(var, value)
+        self.simulate()
+        os.chdir(self.base_path)
+        self.extract_data()
+        self.split_residuals(chunk_size, False, True, True)
+        index = int(attack_istant * READINGS_PER_SECOND / CHUNK_SIZE_CAR)
+        attacked_chunk = self.DB['data'][index]
+        print("Attacked chunk: ")
+        print(attacked_chunk)
+        print("Prediction:")
+        print(self.clf.predict([attacked_chunk]))
+    
+
     def simulate_car(self, noisy):
 
         # extracts data needed to simulate the model
@@ -435,20 +484,24 @@ class SimulinkPlant:
 
         # extract data from model and save it in csv format file
         self.extract_data()
-        # self.write_data()
+        self.write_data() # writes residuals too
 
         # plot values
         # self.plotAll()
 
         # calculate stats and save it in csv format file
-        # self.residual_residual_stats()
-        self.write_stats()
+        # self.residual_residual_stats() # DA RIMUOVERE (?)
+        # self.write_stats()
 
-        self.split_residuals()
+        self.split_residuals(CHUNK_SIZE_CAR, False, True, False)
+        # self.split_residuals()
 
-        self.fit_and_predict()
+        self.fit_model()
+        # print(self.DB)
 
-        self.k_fold()
+        self.attack_sensor("transmission_var", 390)
+
+        # self.k_fold()
 
         # DA RIVEDERE
         # calculate mse for speed and transmission
@@ -518,7 +571,7 @@ class SimulinkPlant:
 
         self.split_residuals()
 
-        self.fit_and_predict()
+        self.fit_model()
 
         # DA RIVEDERE
         # calculate mse for speed and transmission
@@ -588,7 +641,7 @@ class SimulinkPlant:
 
         self.split_residuals()
 
-        self.fit_and_predict()
+        self.fit_model()
 
         self.k_fold()
 

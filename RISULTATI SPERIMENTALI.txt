@@ -192,6 +192,11 @@ Splits: 15
 0.9896666666666666
 
 
+ATTACK DETECTION
+
+chunk 100, variance 500, y = -1 ---> attack detected
+
+
 ---------------- CLIMATE -------------------------------
 
 

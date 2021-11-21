@@ -25,7 +25,8 @@
             "noisy_stats_csv": "noisy_stats_car.csv",
             "model_directory": "../car/model",
             "data_directory": "../car/data", 
-            "residual_csv": "residual_car.csv"
+            "residual_csv": "residual_car.csv",
+            "dataset": "../car/data/car_dataset.json"
         },
         {
             "model_name": "aero_dap3dof",
@@ -46,7 +47,8 @@
             "noisy_stats_csv": "noisy_stats_apollo.csv",
             "model_directory": "../apollo/model",
             "data_directory": "../apollo/data",
-            "residual_csv": "residual_apollo.csv"
+            "residual_csv": "residual_apollo.csv",
+            "dataset": "../apollo/apollo_dataset.json"
         },
         {
             "model_name": "sldemo_auto_climate_elec",
@@ -75,7 +77,8 @@
             "noisy_stats_csv": "noisy_climate.csv",
             "model_directory": "../climate/model",
             "data_directory": "../climate/data",
-            "residual_csv": "residual_climate.csv"
+            "residual_csv": "residual_climate.csv",
+            "dataset": "../climate/climate_dataset.json"
         }
     ]
 

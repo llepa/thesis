@@ -1,9 +1,0 @@
-if [ "$1" == car -o "$1" == apollo ]; then
-    if [ "$2" == noise -o "$2" == nonoise ]; then
-        python main.py "$1" "$2"
-    else 
-        echo "$0" "$1" Error: option does not exist
-    fi
-else
-    echo "$0" Error: model does not exist
-fi

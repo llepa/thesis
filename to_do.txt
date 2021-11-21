@@ -1,0 +1,32 @@
+1. Introdurre rumore gaussiano (decidere quindi la varianza appropriata) a livello dei sensori affinché la RMSE per ogni sensore sia maggiore del 70% ma minore del 95% (rumore credibile ma "fisiologico").
+	
+	Si è scelta alla fine una varianza del rumore tale che la RMSE dei segnali con e senza rumore sia compresa tra 80% e 90%
+
+2. Fare il training di un modello di ML basato su SVM (unsupervised o supervised)...
+
+3. Se il rumore viene introdotto a livello di un determinato sensore, misurando semplicemente quel sensore non siamo certi che la sua misurazione sia stata contraffatta, per questo bisogna identificare in qualche modo il sensore la quale misurazione è stata modificata.
+
+4. digital twin --> sensor fingerprint
+
+5. Capire perché bisogna identificare il sensore (forse per la 3?)
+
+6. 
+s1 = transmission_residual
+s2 = speed_residual
+
+mean | variance | std_dev | skewness | kurtosis | id
+-----|----------|---------|----------|----------|--- 
+	 | 			|		  |    		 |  		| 1
+	 | 			|		  |    		 |  		| 2
+	 | 			|		  |    		 |  		| 3
+	 | 			|		  |    		 |  		| 4  
+
+Per classificare più samples bisogna splittare i dati (residual dei sensori) dei sensori in chunks e classificarli in base alla classe di apparteneneza
+
+7. The ML model is trained on data (divided)
+
+8. Creare sequene di dati di sensori (estratti c)
+
+9. Gli attacchi pensati come introduzione di rumore a cavallo di due chunk possono essere considerati come due attacchi separati su due chunk diversi e consecutivi. E trarne quindi conseguenze
+
+10. Gli attacchi con introduzione di rumore nello stesso chunk che vanno ad alterare misurazioni non consecutive possono essere considerati come attacchi su misurazioni  consecutive, posizionate in una qualsiasi "posizione" all'interno dello stesso chunk.
