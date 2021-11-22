@@ -8,7 +8,8 @@
 \usepackage{microtype}
 \usepackage[italian]{babel}
 \usepackage[utf8]{inputenx}
-
+\usepackage[hidelinks]{hyperref}
+\usepackage{amssymb}
 \usepackage{hyperref}
 \hypersetup{pdftitle={tesi},pdfauthor={Andrei Laurentiu Lepadat}}
 
@@ -78,18 +79,84 @@
 Ogni sistema cyber-fisico che si rispetti è dotato di almeno un sensore che ha il compito di misurare una determinata ``qualità'' fisica di interesse per il sistema stesso. 
 I dati che vengono rilevati dai sensori spesso vengono memorizzati localmente e/o in modo remoto e possono essere impiegati,
 come nel lavoro qui presentato, per fini paralleli o trasversali a quelli per cui sono stati installati.
-Una sequenza di dati estratti da sensori ordinata temporalemente viene chiamata \textit{serie temporale} (\textit{time-series} in inglese).
+Una sequenza di dati estratti da sensori ordinata temporalmente viene chiamata \textit{serie temporale} (\textit{time-series} in inglese).
 
 Comunemente i sensori sono imperfetti per costruzione e trasportano intrinsecamente un'incertezza (rumore) che influenza le misurazioni da essi compiute.
 Sia 
-$$
-\bar{y}_{k} = y_{k} + \delta_{k}
-$$
+
+\begin{equation}
+\bar{y}_{k} = y_{k} + \delta_{k}\label{eq:1}
+\end{equation}
 il valore misurato da un determinato sensore nell'istante di tempo \textit{k}, composto da $y_k$, il valore effettivo in quell'istante della grandezza misurata, più $\delta_k$, il rumore aggiunto.
 
 In un determinato istante di tempo, il valore di ogni sensore del sistema costituisce lo \textit{stato} del sistema.
 La sfida di estrarre il fingerprint dai sensori è data dal fatto che questi stati sono dinamici. 
-Prendendo in considerazione, per esempio, un termometro, se la temperatura dell'ambiente che misura rimane costante nel tempo è facile estrarre
+Prendendo in considerazione, per esempio, un termometro, se la temperatura dell'ambiente che misura rimane costante nel tempo è facile estrarre il fingerprint del rumore e costruirne il profilo, 
+ma in processi reali non è così semplice, gli stati cambiano continuamente, per esempio l'aumento di velocità di una macchina per via della pressione sul pedale dell'acceleratore.
+\`E importante catturare queste variazioni affinch\'e le misurazioni dinamiche dei sensori possano essere stimate.
+In [1] questo problema viene affrontato definendo un modello analitico del sistema interessato, rappresentato tramite il modello \textit{State-Space}. 
+Vengono implementate le tecniche definite in [2], definendo cos\`i il modello lineare tempo inviariante (LTI) del sistema, rappresentato dal sistema di equazioni
+
+\begin{equation}
+    \begin{cases}
+        x_{k+1} = Ax_k + Bu_k + \vartheta_k, \\
+        y_k = Cx_k + \eta_k:
+    \end{cases}
+\end{equation}
+in cui $x_k \in \mathbb{R}^n$ rappresenta lo stato del sistema, $u_k \in \mathbb{R}^p$ l'input di controllo e
+$\vartheta_k$ il rumore al tempo $k$.
+$y_k \in \mathbb{R}_m$ e $\eta_k \in \mathbb{R}_m$ rappresentano, rispettivamente, la misurazione e il rumore del sensore al tempo $k$.
+$A$, $B$, $C$ sono le matrici dello spazio di stato di dimensioni adeguate che rappresentato la dinamica del sistema.
+
+Definito il precedente sistema, ci sono molti punti che un attaccante mal intenzionato potrebbe bersagliare.
+Nel lavoro presentato, cos\`i come in [1], vengono presi in considerazione \textit{spoofing attack} ai sensori che potrebbero essere portati a termine tramite uno schema \textit{Man-in-The-Middle}.
+L'equazione lineare che rappresenta questa tipologia di attacchi \`e data da
+
+\begin{equation}
+\bar{y}_{k} = y_{k} + \delta_{k} = Cx_k + \eta_k + \delta_k,\footnote{Notare l'ugualianza con l'equazione \ref{eq:1}: un attacco \`e considerato come un'introduzione di rumore nella misurazione fatta da un sensore.}
+\end{equation}
+in cui $\delta_k \in \mathbb{R}_m$ rappresenta un attacco ai sensori.
+
+In [1], dato l'output $\bar{y}_k$, viene adoperato il \textit{filtro di Kalman} per stimare lo stato del sistema e il vettore dei \textit{residui}, definito, in questo contesto, come la differenza tra la reale misurazine effettuata dal sensore
+e la stima della misurazione calcolata dal filtro nell'istante $k$:
+
+\begin{equation}
+    r_k := \bar{y}_k - \hat{y}_k,
+\end{equation}
+dove $\hat{y}_k$ \`e l'output del filtro di Kalman.
+
+Detto ci\`o, per quantificare la bont\`a del modello del sistema, viene utilizzato l'\textit{Errore Quadratico Medio (RMSE)}, definito come
+\begin{equation}
+    RMSE = \sqrt{\frac{\sum_{i=1}^n (y_i - \hat{y}_i)}{n}}.
+\end{equation}
+Questa metrica rappresenta la distanza tra il valore stimato e quello misurato, ovvero quanto il primo \`e lontano dal secondo.
+Nella letteratura della teoria del controllo, modelli con un'accuratezza superiore al 70\% sono considerati accettabili approssimazioni della dinamica di sistemi reali.
+
+Il vettore dei residui \`e quindi parte centrale per la definizione dei fingerprint dei sensori.
+A tale scopo viene definito un problema di \textit{Machine Learning} che ha come \textit{feature} dei valori statistici estratti dai vettori residui.
+Queste feature sono mostrate nella 
+
+
+\begin{table}[htbp]
+    \begin{center}
+    \begin{tabular}{|l|l|}
+    \hline
+    Feature & Descrizione \\
+    \hline
+    Media & $\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$ \\
+    \hline
+    Varianza \\
+    \hline
+    Deviazione Standard \\
+    \hline
+    Asimmetria \\
+    \hline
+    Curtosi \\
+    \hline
+    \end{tabular}
+    \end{center}
+\end{table}
+
 
 % ----------------------------------------------------------------------------------------
 
