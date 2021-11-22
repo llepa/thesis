@@ -11,6 +11,10 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{amssymb}
 \usepackage{hyperref}
+
+\usepackage{titlesec}
+\titleformat{\chapter}[hang]{\Huge\bf}{\thechapter{. }}{0pt}{\Huge\bf}
+
 \hypersetup{pdftitle={tesi},pdfauthor={Andrei Laurentiu Lepadat}}
 
 \title{Using Sensor and Process Noise Fingerprint to Detect Cyber Attacks in CPS}
@@ -44,7 +48,7 @@
 
 \mainmatter
 
-\chapter{Introduzione} 
+\chapter{Introduzione}
 % Scrivere alla fine 
 
 \section{Contesto}
@@ -60,7 +64,7 @@
 % Describe here your contributions, namely the missing items identified in the motivations. esempio:
 % Questo lavoro propone un metodo per generare cibo per tutti gli abitanti dei paesi sottosviluppati ...
 
-\section{Lavori correlati}
+\section{Stato dell'arte}
 % Describe here the state of the art (e.g., algorithms and tools  available).
 % For each paper/tool explain what you do that is not already available (killing).
 
@@ -72,7 +76,6 @@
 
 \chapter{Background}
 % Put in this section all the background knowledge needed to understand what you did.
-
 % Parlare di dati di sensori, serie temporali estratti dai sensori, rmse, rumore intrinseco sensori --> residual
 % machine learning model e decision 
 
@@ -141,21 +144,21 @@ e incrementando $N$, anche $\epsilon$ cresce, allargando l'intervallo di confide
 Tale intervallo di condifenza pu\`o essere definito anche per momenti di ordine superiore.
 
 Nel contesto del presente lavoro, come si vedr\`a, volendo giudicare la legittimit\`a delle misurazioni di un determinato sensore, determinate propriet\`a statistiche delle nuove misurazioni (nuove nel contesto di normale 
-funzionamento del sistema aperto ad attacchi) verranno confrontate con le stesse propriet\`a di misurazioni effettuate in condizioni \textit{sicure} (questi valori sono chiamati valori di \textit{reference}). 
+funzionamento del sistema \textit{aperto} ad attacchi) verranno confrontate con le stesse propriet\`a di misurazioni effettuate in condizioni \textit{sicure} (questi valori sono chiamati valori di \textit{reference}). 
 Per le nuove misurazioni, prendendo ancora in esempio il valore medio e volendo avere un intervallo di confidenza il pi\`u piccolo possibile (quindi un $\epsilon$ il pi\`u piccolo possibile), bisogna essere attenti per via di valori di $N$ non molto grandi,
-caratteristica preferibile in quanto non si vogliiono campionare troppi valori in situazioni real-time.
- 
-\ldots bisogner\`a affrontare il problema avvalendosi dell'aiuto di un determintao modello di \textit{Machine Learning}, che d\`a buone approssimazioni
+caratteristica preferibile in quanto non si vogliono campionare troppi valori in situazioni real-time (equivarrebbe ad aspettare di pi\`u per prendere una decisione, e quindi essere potenzialmente per più tempo sotto attacco).
+Scegliere un'intervallo di condifenza delle nuove misurazioni troppo grande potrebbe portare ad una sovrapposizione tra il nuovo intervallo ed quello di reference\footnote{Il caso ideale sarebbe o di inclusione del primo nel secondo o di disgiunzione, rilevando nel primo caso un valore ammesso e nel secondo caso un attacco.}.
+Per avere una sensibilit\`a migliore contro gli attacchi il problema viene affrontato avvalendosi dell'aiuto di un determintao modello di \textit{Machine Learning}, 
+che ha un buon comprtamento verso valori che non sono perfettamente discriminabili.
 
-Il vettore dei residui \`e quindi parte fondamentale per la definizione dei fingerprint dei sensori.
-A tale scopo viene definito un problema di M.L. che ha come \textit{feature} alcuni valori statistici estratti dai vettori residui.
+A tale scopo viene definito un problema di M.L. che ha come \textit{feature} alcuni valori statistici (di cui si \`e parlato precedentemente) estratti dai vettori residui\footnote{Il vettore dei residui \`e quindi parte fondamentale per la definizione dei fingerprint dei sensori.}.
 Queste feature sono mostrate nella Tabella \ref{tab:1}.
 
 \begin{table}[tb]
     \begin{center}
     \begin{tabular}{|l|l|}
     \hline
-    Feature & Descrizione \\
+    \textbf{Feature} & \textbf{Descrizione} \\
     \hline
     Media & $\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$ \\
     \hline
@@ -184,22 +187,16 @@ Nel presente lavoro il problema viene definito come un problema \textit{supervis
 \end{equation}
 Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un elemento di $Y$, cio\`e la classe $C_i$ di appartenenza.
 
-% Noi calcoliamo i valori statistici derivanti dal sistema quando il sistema non è sotto attacco (la reference) su N campioni. 
-% Quando si vanno a calcoalre le features avremo una certa confidenza statistica (un certo epsilon di errore) 
-% con confidenza statistica almeno 1-delta la media (per esempio) è il valore trovato +- epsilon, epsilon e delta dipendono da N.
-% Pr{\bar{x} - \epsilon <= \mu <= \bar{x} + \epsilon} = 1 - \delta
-% Questi numeri rappresentano un intervallino. (alta confidenza statistica -> piccolo intervallino)
-% Quando facciamo le operazioni normali, non vogliamo prendere un epsilon troppo grande, perché ci vorrebbe tropppo tempo per rilevare un attacco 
-% L'intervallo calcolato durante il normale funzionamento potrebbe avere un'intersezione non vuota con quello della reference (no attacco)
-% A questo punto non sappiamo se c'è attacco o no, qui entra in gioco SVM perché...
-
-% Nel presente lavoro, vengono definiti due problemi di M.L., uno \textit{Supervisionato} e uno \textit{Non Supervisionato}.
-% Nel primo caso il dataset \`e composto da coppie del tipo $D = \{ (x_i, y_i)_{i=1}^N \}$, nel secondo caso del tipo $D = \{ (x_i)_{i=1}^N \}$.
-
 % ----------------------------------------------------------------------------------------
 
 \chapter{Metodi}
 % Describe here the algorithm design from a math perspective. No code here.
+% Descrivere la suddivisione in chunks e come viene definito il modello di M.L.
+
+
+Come anticipato nella precedente sezione, il prossimo passo \`e quello di definire correttamente il problema di M.L. ed utilizzare il giusto algoritmo di learning.
+Per questi scopi bisogna preparare i dati estratti dai sensori per poter essere utilizzati efficacemente.
+
 
 % ----------------------------------------------------------------------------------------
 
@@ -208,7 +205,7 @@ Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un e
 % Use pseudo-code or diagrams.
 
 % Parlare del come si è implementato il rumore intrinseco in un modello symulink
-% Parlare di come è stato suddiviso in chunks il vettore dei residui
+
 % ----------------------------------------------------------------------------------------
 
 \chapter{Risultati sperimentali}
@@ -220,13 +217,16 @@ Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un e
 
 \section{Configurazione (Setting) (?)}
 % describe experimental setting: hardware used, software used, data used, etc. ....
+% Descrivere come viene simulato il process noise
 
 \section{Casi di studio}
 % describe here the case studies used in the experiments
+% car e climate 
 
 \section{Correttezza}
 % describe here experiments aimed at showing correctness of your implementation
 % Risultati cross-validation
+% esistenza del fingerprint e a corretta discriminazione tra sensori
 
 \section{Valutazione computazionale}
 % describe here experiments aimed at evaluating computational performance (e.g., CPU usage, RMA usage, etc)
