@@ -136,13 +136,16 @@ Questo intevallo dipende, nel caso del valore medio, si definisce come
     Pr\{\bar{x} - \epsilon \leq \mu \leq \bar{x} + \epsilon\} = 1 - \delta,
     \label{eq:2}
 \end{equation}
-in cui $\mu$ e $\bar{x}$ sono, rispettivamente, la media effettiva e quella calcolata. $\epsilon$ e $\delta$ sono valori che dipendono da $N$.
+in cui $\mu$ e $\bar{x}$ sono, rispettivamente, la media effettiva e quella calcolata. $\epsilon$ e $\delta$ sono valori che dipendono da $N$, e mantenendo $\delta$ costante
+e incrementando $N$, anche $\epsilon$ cresce, allargando l'intervallo di confidenza.
 Tale intervallo di condifenza pu\`o essere definito anche per momenti di ordine superiore.
 
-Come verr\`a visto, per come \`e stato affrontato il problema nel presente lavoro, nella \ref{eq:2}, $\epsilon$ dipende strettamente dal numero di campioni $N$, e al crescere di quest'ultimo cresce anche $\epsilon$.
-Volendo avere un intervallo di confidenza il pi\`u piccolo possibile (quindi un $\epsilon$ il pi\`u piccolo possibile), bisogna essere attenti nel caso di valori di $N$ non molto grandi \ldots
-e per via della sensibilit\`a del problema trattato al crescere del numero di campioni acquisiti prima di poter prendere decisioni riguardo allo stato di sicurezza del sensore, 
-bisogner\`a affrontare il problema avvalendosi dell'aiuto di un determintao modello di \textit{Machine Learning}, che d`a buone approssimazioni
+Nel contesto del presente lavoro, come si vedr\`a, volendo giudicare la legittimit\`a delle misurazioni di un determinato sensore, determinate propriet\`a statistiche delle nuove misurazioni (nuove nel contesto di normale 
+funzionamento del sistema aperto ad attacchi) verranno confrontate con le stesse propriet\`a di misurazioni effettuate in condizioni \textit{sicure} (questi valori sono chiamati valori di \textit{reference}). 
+Per le nuove misurazioni, prendendo ancora in esempio il valore medio e volendo avere un intervallo di confidenza il pi\`u piccolo possibile (quindi un $\epsilon$ il pi\`u piccolo possibile), bisogna essere attenti per via di valori di $N$ non molto grandi,
+caratteristica preferibile in quanto non si vogliiono campionare troppi valori in situazioni real-time.
+ 
+\ldots bisogner\`a affrontare il problema avvalendosi dell'aiuto di un determintao modello di \textit{Machine Learning}, che d\`a buone approssimazioni
 
 Il vettore dei residui \`e quindi parte fondamentale per la definizione dei fingerprint dei sensori.
 A tale scopo viene definito un problema di M.L. che ha come \textit{feature} alcuni valori statistici estratti dai vettori residui.
