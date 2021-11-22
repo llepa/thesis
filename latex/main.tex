@@ -83,7 +83,6 @@ Una sequenza di dati estratti da sensori ordinata temporalmente viene chiamata \
 
 Comunemente i sensori sono imperfetti per costruzione e trasportano intrinsecamente un'incertezza (rumore) che influenza le misurazioni da essi compiute.
 Sia 
-
 \begin{equation}
 \bar{y}_{k} = y_{k} + \delta_{k}\label{eq:1}
 \end{equation}
@@ -96,7 +95,6 @@ ma in processi reali non è così semplice, gli stati cambiano continuamente, pe
 \`E importante catturare queste variazioni affinch\'e le misurazioni dinamiche dei sensori possano essere stimate.
 In [1] questo problema viene affrontato definendo un modello analitico del sistema interessato, rappresentato tramite il modello \textit{State-Space}. 
 Vengono implementate le tecniche definite in [2], definendo cos\`i il modello lineare tempo inviariante (LTI) del sistema, rappresentato dal sistema di equazioni
-
 \begin{equation}
     \begin{cases}
         x_{k+1} = Ax_k + Bu_k + \vartheta_k, \\
@@ -119,7 +117,6 @@ in cui $\delta_k \in \mathbb{R}_m$ rappresenta un attacco ai sensori.
 
 In [1], dato l'output $\bar{y}_k$, viene adoperato il \textit{filtro di Kalman} per stimare lo stato del sistema e il vettore dei \textit{residui}, definito, in questo contesto, come la differenza tra la reale misurazine effettuata dal sensore
 e la stima della misurazione calcolata dal filtro nell'istante $k$:
-
 \begin{equation}
     r_k := \bar{y}_k - \hat{y}_k,
 \end{equation}
@@ -132,12 +129,26 @@ Detto ci\`o, per quantificare la bont\`a del modello del sistema, viene utilizza
 Questa metrica rappresenta la distanza tra il valore stimato e quello misurato, ovvero quanto il primo \`e lontano dal secondo.
 Nella letteratura della teoria del controllo, modelli con un'accuratezza superiore al 70\% sono considerati accettabili approssimazioni della dinamica di sistemi reali.
 
-Il vettore dei residui \`e quindi parte centrale per la definizione dei fingerprint dei sensori.
-A tale scopo viene definito un problema di \textit{Machine Learning} che ha come \textit{feature} dei valori statistici estratti dai vettori residui.
-Queste feature sono mostrate nella 
+Per ogni momento statistico (media, deviazione standard, \ldots) di una serie storica (ma non solo) si pu\`o definire un \textit{intervallo di confidenza} 
+che esprime la probabilit\`a che il valore calcolato sugli $N$ campioni della serie approssimi il valore effettivo del momento statistico.
+Questo intevallo dipende, nel caso del valore medio, si definisce come 
+\begin{equation}
+    Pr\{\bar{x} - \epsilon \leq \mu \leq \bar{x} + \epsilon\} = 1 - \delta,
+    \label{eq:2}
+\end{equation}
+in cui $\mu$ e $\bar{x}$ sono, rispettivamente, la media effettiva e quella calcolata. $\epsilon$ e $\delta$ sono valori che dipendono da $N$.
+Tale intervallo di condifenza pu\`o essere definito anche per momenti di ordine superiore.
 
+Come verr\`a visto, per come \`e stato affrontato il problema nel presente lavoro, nella \ref{eq:2}, $\epsilon$ dipende strettamente dal numero di campioni $N$, e al crescere di quest'ultimo cresce anche $\epsilon$.
+Volendo avere un intervallo di confidenza il pi\`u piccolo possibile (quindi un $\epsilon$ il pi\`u piccolo possibile), bisogna essere attenti nel caso di valori di $N$ non molto grandi \ldots
+e per via della sensibilit\`a del problema trattato al crescere del numero di campioni acquisiti prima di poter prendere decisioni riguardo allo stato di sicurezza del sensore, 
+bisogner\`a affrontare il problema avvalendosi dell'aiuto di un determintao modello di \textit{Machine Learning}, che d`a buone approssimazioni
 
-\begin{table}[htbp]
+Il vettore dei residui \`e quindi parte fondamentale per la definizione dei fingerprint dei sensori.
+A tale scopo viene definito un problema di M.L. che ha come \textit{feature} alcuni valori statistici estratti dai vettori residui.
+Queste feature sono mostrate nella Tabella \ref{tab:1}.
+
+\begin{table}[tb]
     \begin{center}
     \begin{tabular}{|l|l|}
     \hline
@@ -145,18 +156,42 @@ Queste feature sono mostrate nella
     \hline
     Media & $\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$ \\
     \hline
-    Varianza \\
+    Varianza & $\sigma = \frac{1}{N}\sum_{i=1}^N (x_i - \bar{x})^2 $ \\
     \hline
-    Deviazione Standard \\
+    Dev. Med. Ass. & $D_{\bar{x}} = \frac{1}{N}\sum_{i=1}^N |x_i - \bar{x}|$ \\
     \hline
-    Asimmetria \\
+    Asimmetria & $\gamma = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^3 $ \\
     \hline
-    Curtosi \\
+    Curtosi & $ \beta = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^4 - 3$\\
     \hline
     \end{tabular}
     \end{center}
+    \caption{Lista delle feature utilizzate; $x$ \`e la serie temporale di dimensione $N$ proveniente dal sensore.}
+    \label{tab:1}
 \end{table}
 
+Un problema di M.L. pu\`o essere definito come una funzione $f: X \to Y$, dato un insieme $D$ (dataset) contenente informazioni riguardanti $f$.
+Fare il \textit{learning} della funzione $f$ significa trovare un'altra funzione $\hat{f}$ che approssima e ritorna valori più vicini possibile ad $f$, specialmente per elementi non presenti in $D$.
+Nel presente lavoro il problema viene definito come un problema \textit{supervised}\footnote{$D = \{ (x_i, y_i)_{i=1}^N \}$} di \textit{classificazione}, cio\`e in cui $f$ \`e definita tale che
+\begin{equation}
+    \begin{array}{l}
+    X := \mathbb{R}^m, \\
+    Y := \{ C_1, C_2, \ldots, C_k \}.
+    \end{array}
+\end{equation}
+Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un elemento di $Y$, cio\`e la classe $C_i$ di appartenenza.
+
+% Noi calcoliamo i valori statistici derivanti dal sistema quando il sistema non è sotto attacco (la reference) su N campioni. 
+% Quando si vanno a calcoalre le features avremo una certa confidenza statistica (un certo epsilon di errore) 
+% con confidenza statistica almeno 1-delta la media (per esempio) è il valore trovato +- epsilon, epsilon e delta dipendono da N.
+% Pr{\bar{x} - \epsilon <= \mu <= \bar{x} + \epsilon} = 1 - \delta
+% Questi numeri rappresentano un intervallino. (alta confidenza statistica -> piccolo intervallino)
+% Quando facciamo le operazioni normali, non vogliamo prendere un epsilon troppo grande, perché ci vorrebbe tropppo tempo per rilevare un attacco 
+% L'intervallo calcolato durante il normale funzionamento potrebbe avere un'intersezione non vuota con quello della reference (no attacco)
+% A questo punto non sappiamo se c'è attacco o no, qui entra in gioco SVM perché...
+
+% Nel presente lavoro, vengono definiti due problemi di M.L., uno \textit{Supervisionato} e uno \textit{Non Supervisionato}.
+% Nel primo caso il dataset \`e composto da coppie del tipo $D = \{ (x_i, y_i)_{i=1}^N \}$, nel secondo caso del tipo $D = \{ (x_i)_{i=1}^N \}$.
 
 % ----------------------------------------------------------------------------------------
 
@@ -170,7 +205,7 @@ Queste feature sono mostrate nella
 % Use pseudo-code or diagrams.
 
 % Parlare del come si è implementato il rumore intrinseco in un modello symulink
-
+% Parlare di come è stato suddiviso in chunks il vettore dei residui
 % ----------------------------------------------------------------------------------------
 
 \chapter{Risultati sperimentali}
@@ -196,6 +231,7 @@ Queste feature sono mostrate nella
 \section{Valutazione tecnica}
 % describe here experiments aimed at evaluating your tools wrt their intended use.
 % For example, software to detect adversarial attacks will be evaluated here showing how good (or bad) it is in detecting attcks.
+% Parlare della grandezza dei chunks trovati
 
 \chapter{Conclusioni}
 % Sum up what you did and outline some possible future developments.
