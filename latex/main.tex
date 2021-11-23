@@ -126,10 +126,10 @@ dove $\hat{y}_k$ \`e l'output del filtro di Kalman.
 
 Detto ci\`o, per quantificare la bont\`a del modello del sistema, viene utilizzato l'\textit{Errore Quadratico Medio (RMSE)}, definito come
 \begin{equation}
-    RMSE = \sqrt{\frac{\sum_{i=1}^n (y_i - \hat{y}_i)}{n}}.
+    RMSE = \sqrt{\frac{\sum_{i=1}^n (y_i - \hat{y}_i)}{n}}\label{eq:5}.
 \end{equation}
 Questa metrica rappresenta la distanza tra il valore stimato e quello misurato, ovvero quanto il primo \`e lontano dal secondo.
-Nella letteratura della teoria del controllo, modelli con un'accuratezza superiore al 70\% sono considerati accettabili approssimazioni della dinamica di sistemi reali.
+Nella letteratura della teoria del controllo, modelli con un'accuratezza\footnote{Se l'RMSE rappresenta un errore, l'accuratezza viene calcolata come 100 - RMSE.} superiore al 70\% sono considerati accettabili approssimazioni della dinamica di sistemi reali.
 
 Per ogni momento statistico (media, deviazione standard, \ldots) di una serie storica (ma non solo) si pu\`o definire un \textit{intervallo di confidenza} 
 che esprime la probabilit\`a che il valore calcolato sugli $N$ campioni della serie approssimi il valore effettivo del momento statistico.
@@ -210,12 +210,12 @@ Scegliere la giusta dimensione $d$ dei vari chunk \`e una scelta sensibile in qu
 L'idea \`e di avere chunk di serie temporali abbastanza grandi da catturare la dinamica del processo e piccoli abbastanza da ridurre il tempo di attesa per discriminare nuove misurazioni.
 
 Tutte le istanze di $X$ che appartengono allo stesso sensore determinano il fingerprint del sensore e il primo compito della funzione $f$ (Funzione \ref{eq:3}) \`e quello di distinguere correttamente i sensori, 
-quindi generare un fingerprint il pi\`u preciso e privo di ambiguit\`a possibile. Nella sezione 5, l'esistenza del fingerprint verr\`a provata empiricamente.
+quindi generare un fingerprint il pi\`u preciso e privo di ambiguit\`a possibile. Nel Capitolo \ref{chap:3}, l'esistenza del fingerprint verr\`a provata empiricamente.
 
 L'algoritmo di M.L. utilizzato \`e il \textit{Support Vector Machine} (SVM), impiegato come un classificatore a 2 classi (One vs. One) che etichetta i dati provenienti dal legittimo sensore (\textit{ground truth}) come un \textit{1}
 e come \textit{0} i dati provenienti dagli altri sensori. In questo modo gli attacchi possono essere considerati come un tipo dato appartenente ad altre classi.
 
-L'algoritmo di SVM verr\`a allenato su un campione di dati che dipender\`a dal sistema considerato e verr\`a validato usando la tecnica del \textit{k-fold cross validation}.
+L'algoritmo SVM verr\`a allenato su un campione di dati che dipender\`a dal sistema considerato e verr\`a validato usando la tecnica del \textit{k-fold cross validation}.
 Successivamente, siccome nel dataset non sono presenti dati relativi ad attacchi, il classificatore a 2 classi potrebbe mancare alcuni degli attacchi.
 
 Per affrontare questo problema viene utilizzato la modalit\`a di SVM ad una classe (\textit{one-class} SVM) per fare il learning del modello di M.L., basandosi su una classe di dati normali (appartenenti quindi ad un solo sensore). 
@@ -227,15 +227,31 @@ Nella fase di testing tutto ci\`o reputato estraneo viene considerato come un at
 % describe here how you implemented the functionalities described in the methods section.
 % Use pseudo-code or diagrams.
 % Parlare del come si è implementato il rumore intrinseco in un modello symulink
-Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione del vettore dei residui, nel presente lavoro viene presa una strada diversa, alternativa e pi\`u semplice di quella presentata in [2].
+Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione del vettori dei residui, nel presente lavoro viene presa una strada diversa, alternativa e pi\`u semplice di quella presentata in [2].
 
-Il rumore process noise viene creato ``artificialmente''. Si utilizza un modello di sistema dinamico ideale, che non introduce alcun tipo di rumore nelle misurazioni di sensori. 
-Sia $y_k$ l'output di un sistema del tipo definito in \ref{eq:4} all'istante $k$ e siano $\delta_j$, $j = 1,\ldots,m$\footnote{{$m$ \`e la dimensione di $y_k$, uguale al numero di sensori del sistema.}}, $m$ variabili aleatorie (una per sensore) $\delta_i \tilde{} N(0,\sigma^2)$ con distruzione di probabilit\`a gaussiana,
-a media nulla e varianza non zero. Il valore di $y_i$ 
+Viene utilizzato un modello di sistema dinamico ideale (che non introduce alcun tipo di rumore nelle misurazioni dei sensori) e viene inserito il process noise ``artificialmente''.
 
+Sia $y_k$ l'output di un sistema del tipo definito in \ref{eq:4} all'istante $k$ e siano $\mathcal{X}_j \sim~\mathcal{N}(0,\sigma_j^2)$, $j = 1,\ldots,m$\footnote{{$m$ \`e la dimensione di $y_k$, uguale al numero di sensori del sistema.}}, $m$ (una per sensore) distribuzioni di probabilit\`a gaussiane con media nulla e varianza $\sigma_j^2$.
+Il valore $\bar{y}_k$ del sistema dopo l'introduzione di rumore \`e uguale a
+\begin{equation}
+    \bar{y}_k = y_k + \delta_k\label{eq:6},
+\end{equation}
+dove $\delta_k$ \`e il vettore che contiene le $m$ estrazioni secondo $\mathcal{X}_j$.
+
+Il vettore dei residui viene quindi ottenuto eseguendo la sottrazione vettoriale $r_j = \bar{y}_j - y_j$, in cui $y_j$ (la serie storica, ovvero la collezione, delle misurazioni relative al sensore $j$ all'istante $n$) agisce come il valore stimato secondo le dinamiche del sistema.
+Dal momento che ogni $r_j$ deve contenere valori di un sistema reale sottoposto a process noise, le varianze $\sigma_j^2$ devono essere tali che le distribuzioni $\mathcal{X}_j$ generino valori per $j=1,\ldots,m$, dalla \ref{eq:5}, tali che
+\begin{equation}
+    100 - \sqrt{\frac{\sum_{k=1}^n (\bar{y}_{j,k} - y_{j,k})}{n}} \geq D_j, \forall j\in\{1,\ldots,n\}\label{eq:7}.
+\end{equation}
+$D_j$ \`e un valore sempre maggiore o uguale di 70 e, in base al ruolo del sensore all'interno del sistema, pu\`o assumere valori pi\`u o meno grandi.
+Sostituendo dall'Equazione \ref{eq:6}, si vede che l'RMSE per ogni sensore $j$ dipende banalmente dalla serie di valori estratti secondo $\mathcal{X}_j$.
+
+Calcolati i vettori dei residui e preparati (divisi in chunk ed estratte le feature) per essere processati dall'algoritmo SVM, 
+il modello risultante viene validato\footnote{Questa operazione ha una duplice funzionalit\`a: quella di validare il modello di M.L. trovato e quella di capire quanto il modello \`e sensibile allla quantit\`a di dati utilizzati nella fase di learning.}
+tramite la k-fold cross validation con $k=2,\ldots,15$.
 % ----------------------------------------------------------------------------------------
 
-\chapter{Risultati sperimentali}
+\chapter{Risultati sperimentali}\label{chap:3}
 % describe the experimental results
 In questo capitolo vengono delineati gli obiettivi della fase sperimentale, il software utilizzato per simulare i sistemi e che produrr\`a i valori di output 
 che sono di interesse per questo lavoro. Vengono presentati di conseguenza due modelli che utilizzati come banco di prova per le tecniche descritte nel Capitolo \ref{chap:2}.
