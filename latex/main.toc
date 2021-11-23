@@ -12,7 +12,7 @@
 \contentsline {chapter}{\numberline {4}Implementazione}{9}{chapter.4}%
 \contentsline {chapter}{\numberline {5}Risultati sperimentali}{11}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Obiettivi}{11}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Configurazione (Setting) (?)}{11}{section.5.2}%
+\contentsline {section}{\numberline {5.2}Configurazione}{11}{section.5.2}%
 \contentsline {section}{\numberline {5.3}Casi di studio}{11}{section.5.3}%
 \contentsline {section}{\numberline {5.4}Correttezza}{11}{section.5.4}%
 \contentsline {section}{\numberline {5.5}Valutazione computazionale}{11}{section.5.5}%

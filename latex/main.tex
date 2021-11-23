@@ -74,7 +74,7 @@
 
 % ----------------------------------------------------------------------------------------
 
-\chapter{Background}
+\chapter{Background}\label{chap:1}
 % Put in this section all the background knowledge needed to understand what you did.
 % Parlare di dati di sensori, serie temporali estratti dai sensori, rmse, rumore intrinseco sensori --> residual
 % machine learning model e decision 
@@ -84,7 +84,7 @@ I dati che vengono rilevati dai sensori spesso vengono memorizzati localmente e/
 come nel lavoro qui presentato, per fini paralleli o trasversali a quelli per cui sono stati installati.
 Una sequenza di dati estratti da sensori ordinata temporalmente viene chiamata \textit{serie temporale} (\textit{time-series} in inglese).
 
-Comunemente i sensori sono imperfetti per costruzione e trasportano intrinsecamente un'incertezza (rumore) che influenza le misurazioni da essi compiute.
+Comunemente i sensori sono imperfetti per costruzione e trasportano intrinsecamente un'incertezza (\textit{process noise}) che influenza le misurazioni da essi compiute.
 Sia 
 \begin{equation}
 \bar{y}_{k} = y_{k} + \delta_{k}\label{eq:1}
@@ -98,7 +98,7 @@ ma in processi reali non è così semplice, gli stati cambiano continuamente, pe
 \`E importante catturare queste variazioni affinch\'e le misurazioni dinamiche dei sensori possano essere stimate.
 In [1] questo problema viene affrontato definendo un modello analitico del sistema interessato, rappresentato tramite il modello \textit{State-Space}. 
 Vengono implementate le tecniche definite in [2], definendo cos\`i il modello lineare tempo inviariante (LTI) del sistema, rappresentato dal sistema di equazioni
-\begin{equation}
+\begin{equation}\label{eq:4}
     \begin{cases}
         x_{k+1} = Ax_k + Bu_k + \vartheta_k, \\
         y_k = Cx_k + \eta_k:
@@ -112,7 +112,6 @@ $A$, $B$, $C$ sono le matrici dello spazio di stato di dimensioni adeguate che r
 Definito il precedente sistema, ci sono molti punti che un attaccante mal intenzionato potrebbe bersagliare.
 Nel lavoro presentato, cos\`i come in [1], vengono presi in considerazione \textit{spoofing attack} ai sensori che potrebbero essere portati a termine tramite uno schema \textit{Man-in-The-Middle}.
 L'equazione lineare che rappresenta questa tipologia di attacchi \`e data da
-
 \begin{equation}
 \bar{y}_{k} = y_{k} + \delta_{k} = Cx_k + \eta_k + \delta_k,\footnote{Notare l'ugualianza con l'equazione \ref{eq:1}: un attacco \`e considerato come un'introduzione di rumore nella misurazione fatta da un sensore.}
 \end{equation}
@@ -134,14 +133,14 @@ Nella letteratura della teoria del controllo, modelli con un'accuratezza superio
 
 Per ogni momento statistico (media, deviazione standard, \ldots) di una serie storica (ma non solo) si pu\`o definire un \textit{intervallo di confidenza} 
 che esprime la probabilit\`a che il valore calcolato sugli $N$ campioni della serie approssimi il valore effettivo del momento statistico.
-Questo intevallo dipende, nel caso del valore medio, si definisce come 
+Questo intevallo, nel caso del valore medio, si definisce come 
 \begin{equation}
     Pr\{\bar{x} - \epsilon \leq \mu \leq \bar{x} + \epsilon\} = 1 - \delta,
     \label{eq:2}
 \end{equation}
 in cui $\mu$ e $\bar{x}$ sono, rispettivamente, la media effettiva e quella calcolata. $\epsilon$ e $\delta$ sono valori che dipendono da $N$, e mantenendo $\delta$ costante
 e incrementando $N$, anche $\epsilon$ cresce, allargando l'intervallo di confidenza.
-Tale intervallo di condifenza pu\`o essere definito anche per momenti di ordine superiore.
+Tale intervallo pu\`o essere definito anche per momenti di ordine superiore.
 
 Nel contesto del presente lavoro, come si vedr\`a, volendo giudicare la legittimit\`a delle misurazioni di un determinato sensore, determinate propriet\`a statistiche delle nuove misurazioni (nuove nel contesto di normale 
 funzionamento del sistema \textit{aperto} ad attacchi) verranno confrontate con le stesse propriet\`a di misurazioni effettuate in condizioni \textit{sicure} (questi valori sono chiamati valori di \textit{reference}). 
@@ -176,48 +175,86 @@ Queste feature sono mostrate nella Tabella \ref{tab:1}.
     \label{tab:1}
 \end{table}
 
-Un problema di M.L. pu\`o essere definito come una funzione $f: X \to Y$, dato un insieme $D$ (dataset) contenente informazioni riguardanti $f$.
+Un problema di M.L. pu\`o essere definito come una funzione 
+\begin{equation}
+f: X \to Y,\label{eq:3}
+\end{equation}
+dato un insieme $D$ (dataset) contenente informazioni riguardanti $f$.
 Fare il \textit{learning} della funzione $f$ significa trovare un'altra funzione $\hat{f}$ che approssima e ritorna valori più vicini possibile ad $f$, specialmente per elementi non presenti in $D$.
-Nel presente lavoro il problema viene definito come un problema \textit{supervised}\footnote{$D = \{ (x_i, y_i)_{i=1}^N \}$} di \textit{classificazione}, cio\`e in cui $f$ \`e definita tale che
+Nel presente lavoro il problema viene definito come un problema di \textit{classificazione}, ovvero in cui $f$ \`e definita tale che
 \begin{equation}
     \begin{array}{l}
     X := \mathbb{R}^m, \\
-    Y := \{ C_1, C_2, \ldots, C_k \}.
+    Y := \{ C_1, C_2, \ldots, C_k \};
     \end{array}
+\end{equation} 
+e \textit{supervised}, cio\'e in cui il datasert \`e del tipo
+\begin{equation}
+    D = \{ (x_i, y_i)_{i=1}^N \}, x_i\in X, y_i\in Y
 \end{equation}
 Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un elemento di $Y$, cio\`e la classe $C_i$ di appartenenza.
 
 % ----------------------------------------------------------------------------------------
 
-\chapter{Metodi}
+\chapter{Metodi}\label{chap:2}
+
 % Describe here the algorithm design from a math perspective. No code here.
 % Descrivere la suddivisione in chunks e come viene definito il modello di M.L.
+Come anticipato nella precedente sezione, il prossimo passo \`e quello di definire correttamente il problema di M.L. ed utilizzare un algoritmo di learning adeguato.
+A questo scopo bisogna preparare i dati estratti dai sensori (e di conseguenza il vettore dei residui) per poter essere utilizzati efficacemente dall'algoritmo di learning.
+Il dataset conterr\`a coppie in cui il primo elemento $x_i$ \`e un vettore le feature elencate nella Tabella \ref{tab:1}, e il secondo elemento $y_i$ \`e la classe di apparteneza che rappresenta il sensore che ha prodotto le misurazioni utilizzate per costruire $x_i$.
+Data la natura statistica delle feature utilizzate, sarebbe inadeguato estrarre le stesse basandosi solamente sulla misurazione avvenuto all'istante di tempo $k$.
+Detto ci\`o, bisogna partizionare ogni serie temporale in blocchetti (\textit{chunk}) di dimensione $d$. 
+Da ogni chunk verranno poi estratte le feature precedentemente menzionate ed etichettate con la classe (quindi sensore) di appartenenza.
+Scegliere la giusta dimensione $d$ dei vari chunk \`e una scelta sensibile in quanto forzer\`a anche la dimensione dei chunk composti da residui di sensori che verranno calcolati durante il normale funzionamento del sistema.
+L'idea \`e di avere chunk di serie temporali abbastanza grandi da catturare la dinamica del processo e piccoli abbastanza da ridurre il tempo di attesa per discriminare nuove misurazioni.
 
+Tutte le istanze di $X$ che appartengono allo stesso sensore determinano il fingerprint del sensore e il primo compito della funzione $f$ (Funzione \ref{eq:3}) \`e quello di distinguere correttamente i sensori, 
+quindi generare un fingerprint il pi\`u preciso e privo di ambiguit\`a possibile. Nella sezione 5, l'esistenza del fingerprint verr\`a provata empiricamente.
 
-Come anticipato nella precedente sezione, il prossimo passo \`e quello di definire correttamente il problema di M.L. ed utilizzare il giusto algoritmo di learning.
-Per questi scopi bisogna preparare i dati estratti dai sensori per poter essere utilizzati efficacemente.
+L'algoritmo di M.L. utilizzato \`e il \textit{Support Vector Machine} (SVM), impiegato come un classificatore a 2 classi (One vs. One) che etichetta i dati provenienti dal legittimo sensore (\textit{ground truth}) come un \textit{1}
+e come \textit{0} i dati provenienti dagli altri sensori. In questo modo gli attacchi possono essere considerati come un tipo dato appartenente ad altre classi.
 
+L'algoritmo di SVM verr\`a allenato su un campione di dati che dipender\`a dal sistema considerato e verr\`a validato usando la tecnica del \textit{k-fold cross validation}.
+Successivamente, siccome nel dataset non sono presenti dati relativi ad attacchi, il classificatore a 2 classi potrebbe mancare alcuni degli attacchi.
+
+Per affrontare questo problema viene utilizzato la modalit\`a di SVM ad una classe (\textit{one-class} SVM) per fare il learning del modello di M.L., basandosi su una classe di dati normali (appartenenti quindi ad un solo sensore). 
+Nella fase di testing tutto ci\`o reputato estraneo viene considerato come un attacco.
 
 % ----------------------------------------------------------------------------------------
 
 \chapter{Implementazione}
 % describe here how you implemented the functionalities described in the methods section.
 % Use pseudo-code or diagrams.
-
 % Parlare del come si è implementato il rumore intrinseco in un modello symulink
+Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione del vettore dei residui, nel presente lavoro viene presa una strada diversa, alternativa e pi\`u semplice di quella presentata in [2].
+
+Il rumore process noise viene creato ``artificialmente''. Si utilizza un modello di sistema dinamico ideale, che non introduce alcun tipo di rumore nelle misurazioni di sensori. 
+Sia $y_k$ l'output di un sistema del tipo definito in \ref{eq:4} all'istante $k$ e siano $\delta_j$, $j = 1,\ldots,m$\footnote{{$m$ \`e la dimensione di $y_k$, uguale al numero di sensori del sistema.}}, $m$ variabili aleatorie (una per sensore) $\delta_i \tilde{} N(0,\sigma^2)$ con distruzione di probabilit\`a gaussiana,
+a media nulla e varianza non zero. Il valore di $y_i$ 
 
 % ----------------------------------------------------------------------------------------
 
 \chapter{Risultati sperimentali}
 % describe the experimental results
+In questo capitolo vengono delineati gli obiettivi della fase sperimentale, il software utilizzato per simulare i sistemi e che produrr\`a i valori di output 
+che sono di interesse per questo lavoro. Vengono presentati di conseguenza due modelli che utilizzati come banco di prova per le tecniche descritte nel Capitolo \ref{chap:2}.
 
 \section{Obiettivi}
 % describe here the objectives of the experimental activity: test correctness;
 % evaluate computational performances (CPU time and RAM); ....
+Gli obiettivi principali di questa fase sono molteplici:
+\begin{itemize}
+    \item Provare l'esistenza del fingerprint relativo ai sensori e quindi della distinguibilit\`a dei dati provenienti da sensori diversi.
+    \item Trovare la giusta dimensione dei chunk in cui saranno divisi i vettori dei residui.
+    \item Mostrare che la quantit\`a di dati di sensori acquisita non indice particolarmente sul fingerprint.
+    \item Definire la tipologia di attacchi che possono essere identificati e quindi valutare la precisione con cui vengono riconosciuti.
+ \end{itemize}
 
-\section{Configurazione (Setting) (?)}
+\section{Configurazione}
 % describe experimental setting: hardware used, software used, data used, etc. ....
-% Descrivere come viene simulato il process noise
+Il programma che implementa le funzionalit\`a qui presentate \`e stato scritto utilizzando diversi linguaggi di programmazione, tra cui principalmente Python e MATLAB.
+Il software utilizzato per ottenere dati provenienti da simulazioni di sistemi cyber-fisici \`e Simulink, un software per simulazione e modellazione di sistemi dinamici.
 
 \section{Casi di studio}
 % describe here the case studies used in the experiments
