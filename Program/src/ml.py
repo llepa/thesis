@@ -8,6 +8,7 @@ import pandas as pd
 import statsmodels.stats.weightstats as ws
 import my_stats
 import statsmodels.stats.descriptivestats as ds
+import statsmodels.robust as rob
 import math
 from sklearn import svm
 from sklearn.model_selection import train_test_split
@@ -16,8 +17,8 @@ from sklearn.neighbors import LocalOutlierFactor
 from sklearn.svm import OneClassSVM
 import warnings
 from sklearn.model_selection import ShuffleSplit, cross_val_score
-
-
+from mpl_toolkits import mplot3d
+import matplotlib.pyplot as plt
 
 # DECIDERE BENE QUESTI PARAMETRI
 SIMULATION_TIME = 1800
@@ -70,7 +71,7 @@ class SimulinkPlant:
         self.residual_df = pd.DataFrame(columns=self.residual_name)
         self.residual_df.reset_index(drop=True, inplace=True)
 
-        cols = ["sensor_residual", "mean", "variance", "std_dev", "skewness", "kurtosis"]
+        cols = ["sensor_residual", "mean", "variance", "mad", "skewness", "kurtosis"]
         self.residual_stats = pd.DataFrame(columns=cols)
         self.residual_stats['sensor_residual'] = self.residual_name
         self.residual_stats.set_index('sensor_residual', inplace=True)
@@ -197,13 +198,14 @@ class SimulinkPlant:
     def residual_residual_stats(self, vector):
         stats1 = ws.DescrStatsW(vector)
         stats2 = ds.describe(vector)
+        stats3 = rob.mad(vector)
 
         # self.residual_stats['mean'] = my_stats.iter(self.csv_data, 1)
         # self.residual_stats['variance'] = my_stats.citer(self.csv_data, 2)
-        # "mean", "variance", "std_dev", "skewness", "kurtosis"
+        # "mean", "variance", "mad", "skewness", "kurtosis"
         self.residual_stats['mean'] = stats1.mean
         self.residual_stats['variance'] = stats1.var
-        self.residual_stats['std_dev'] = stats1.std
+        self.residual_stats['mad'] = stats3
         self.residual_stats['skewness'] = stats2.skew()
         self.residual_stats['kurtosis'] = stats2.kurtosis()
         print(self.residual_stats)
@@ -258,11 +260,12 @@ class SimulinkPlant:
         
         stats1 = ws.DescrStatsW(chunk)
         stats2 = ds.describe(chunk)
+        stats3 = rob.mad(chunk)
 
         data = []
         data.append(stats1.mean)
         data.append(stats1.var)
-        data.append(stats1.std)
+        data.append(stats3)
         data.append(stats2.skew()[sensor])
         data.append(stats2.kurtosis()[sensor])     
         
@@ -493,13 +496,37 @@ class SimulinkPlant:
         # self.residual_residual_stats() # DA RIMUOVERE (?)
         # self.write_stats()
 
-        self.split_residuals(CHUNK_SIZE_CAR, False, True, False)
-        # self.split_residuals()
+        # self.split_residuals(CHUNK_SIZE_CAR, False, True, False)
+        self.split_residuals()
 
-        self.fit_model()
+        fig = plt.figure()
+        plt.rcParams['grid.color'] = (1, 1, 1, 1)
+        ax = plt.axes(projection='3d')
+        ax.xaxis.pane.fill = False
+        ax.yaxis.pane.fill = False
+        ax.zaxis.pane.fill = False
+        speed = self.DB['data'][0:len(self.DB['data']) // 2]
+        x1 = [x[0] for x in speed]
+        y1 = [x[1] for x in speed]
+        z1 = [x[2] for x in speed]
+        print(x1)
+        transmission = self.DB['data'][len(self.DB['data']) // 2: len(self.DB['data'])]
+        x2 = [x[0] for x in transmission]
+        y2 = [x[1] for x in transmission]
+        z2 = [x[2] for x in transmission]
+        ax.scatter3D(x1, y1, z1, c=z1, cmap='Greens', label='speed')
+        ax.scatter3D(x2, y2, z2, c=z2, cmap='Blues', label='transmission')
+        ax.set_xlabel('mean')
+        ax.set_ylabel('variance')
+        ax.set_zlabel('mad')
+        ax.legend()
+        plt.show()
+        
+
+        # self.fit_model()
         # print(self.DB)
 
-        self.attack_sensor("transmission_var", 390)
+        # self.attack_sensor("transmission_var", 390)
 
         # self.k_fold()
 

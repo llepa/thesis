@@ -266,12 +266,12 @@ Descritte le basi teoriche e metodologiche prese in considerazione, queste sono 
 In questo capitolo vengono delineati gli obiettivi della fase sperimentale, il software utilizzato per simulare i sistemi considerati e che quindi produce i valori di output 
 che sono punto centrale di questo lavoro. Vengono presentati di conseguenza due modelli utilizzati come banco di prova per le tecniche descritte nel Capitolo \ref{chap:3}.
 
-\section{Obiettivi}
+\section{Obiettivi}\label{sec:1}
 % describe here the objectives of the experimental activity: test correctness;
 % evaluate computational performances (CPU time and RAM); ....
 Gli obiettivi principali di questa fase sono molteplici.
 \begin{itemize}
-    \item Provare l'esistenza del fingerprint relativo ai sensori e quindi della distinguibilit\`a dei dati provenienti da sensori diversi.
+    \item Mostrare l'esistenza del fingerprint.
     \item Trovare la giusta dimensione dei chunk in cui saranno divisi i vettori dei residui.
     \item Mostrare che la quantit\`a di dati di sensori acquisita non incide particolarmente sul fingerprint.
     \item Definire la tipologia di attacchi che possono essere identificati e quindi valutare la precisione con cui vengono riconosciuti.
@@ -292,8 +292,70 @@ I due modelli di cui si \`e parlato rappresentano entrambi sottosistemi presenti
     \item Modello di un'automobile a tramissione automatica (Figura \ref{fig:1});
     \item Modello di un sistema di controllo automatico del clima dell'ambiente interno di un'automobile (Figura \ref{fig:2}).
 \end{itemize}
-Nei diagrammi di entrambi i modelli, i rispettivi segnali di importanza per per questa fase sono stati segnati con un numero (ID del sensore) all'interno di un cerchio rosso e sono rispettivamente, 
-in ordine di apparizione, per il primo modello velocit\`a del veicolo e velocit\`a della trasmissione, e per il secondo modello le temperatura dell'abitacolo, la temperatura emessa dal climatizzatore e la temperatura $t$ che \`e prodotta come somma dei contributi di alcuni valori non rilevanti in questo contesto.
+Nei diagrammi dei due modelli, i rispettivi segnali importanti in questa fase sono stati marcati con un numero (ID del sensore) inscritto in un cerchio rosso e sono rispettivamente, 
+in ordine di apparizione, per il primo modello velocit\`a del veicolo e velocit\`a della trasmissione, e per il secondo modello le temperatura dell'abitacolo, la temperatura emessa dal climatizzatore e la temperatura $t$, che \`e prodotta come somma dei contributi di alcuni valori non rilevanti in questo contesto.
+
+\section{Correttezza}
+% describe here experiments aimed at showing correctness of your implementation
+% Risultati cross-validation
+% esistenza del fingerprint e a corretta discriminazione tra sensori
+\begin{figure}[t]
+    \includegraphics[scale=0.6]{fingerprint.png}
+    \centering
+    \caption{Esistenza del fingerprint per il modello in Figura \ref{fig:1}.}
+    \label{fig:3}
+\end{figure}
+
+Si vuole ora provare alcuni dei punti anticipati nella Sezione \ref{sec:1}.
+Nella Figura \ref{fig:3} possiamo vedere la rappresentazione grafica delle feature statistiche dei vettori dei residui dei due sensori che appartengono al modello in Figura \ref{fig:1}.
+\`E facile individuare i due fingerprint, questo ci d\`a un'idea di come il profilo del rumore sia una peculiarit\`a di ogni sensore. Nell'esempio proposto vengono utilizzate tre feature, nello specifico media, varianza e deviazione media assoluta.
+
+Come gi\`a detto in precedenza, per catturare le giuste dinamiche del sistema, vi \`e la necessit\`a di suddividere il dataset in blocchi, e questi non devono avere una dimensione tale da non ritardare eccessivamente l'intervallo di tempo che deve passare affinch\'e un attacco venga identificato.
+
+Nel caso del primo sistema, un modello SVM viene iterativamente allenato e testato con chunk che hanno una dimensione crescente, da 5 misurazioni a 55, con step di 5.
+
+\begin{table}[tb]
+    \begin{center}
+    \begin{tabular}{|c|c|c|}
+    \hline
+    \textbf{Dimensione Chunk / Sensore} & \textbf{1} & \textbf{2} \\
+    \hline
+    5 & 0.879 & 0.772 \\
+    \hline
+    10 & 0.946 & 0.909 \\
+    \hline
+    15 & & \\
+    \hline
+    20 & & \\
+    \hline
+    25 & & \\
+    \hline
+    30 & & \\
+    \hline
+    35 & & \\
+    \hline
+    40 & & \\
+    \hline
+    45 & & \\
+    \hline
+    50 & & \\
+    \hline
+    55 & & \\
+    \hline
+    \end{tabular}
+    \end{center}
+    \caption{}
+    \label{tab:2}
+\end{table}
+
+\section{Valutazione computazionale} % probabilmente da rimuovere
+% describe here experiments aimed at evaluating computational performance (e.g., CPU usage, RMA usage, etc)
+
+
+\section{Valutazione tecnica}
+% describe here experiments aimed at evaluating your tools wrt their intended use.
+% For example, software to detect adversarial attacks will be evaluated here showing how good (or bad) it is in detecting attcks.
+% Parlare della grandezza dei chunks trovati
 
 \begin{sidewaysfigure}
     \includegraphics[scale=0.38]{car.png}
@@ -308,19 +370,6 @@ in ordine di apparizione, per il primo modello velocit\`a del veicolo e velocit\
     \caption{Modello Simulink di un sistema di controllo automatico del clima dell'ambiente interno di un'autovettura.}
     \label{fig:2}
 \end{sidewaysfigure}
-
-\section{Correttezza}
-% describe here experiments aimed at showing correctness of your implementation
-% Risultati cross-validation
-% esistenza del fingerprint e a corretta discriminazione tra sensori
-
-\section{Valutazione computazionale}
-% describe here experiments aimed at evaluating computational performance (e.g., CPU usage, RMA usage, etc)
-
-\section{Valutazione tecnica}
-% describe here experiments aimed at evaluating your tools wrt their intended use.
-% For example, software to detect adversarial attacks will be evaluated here showing how good (or bad) it is in detecting attcks.
-% Parlare della grandezza dei chunks trovati
 
 \chapter{Conclusioni}
 % Sum up what you did and outline some possible future developments.
