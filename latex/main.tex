@@ -11,10 +11,13 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{amssymb}
 \usepackage{hyperref}
+\usepackage{rotating}
 
 \usepackage{algorithmicx}
 \usepackage{titlesec}
 \titleformat{\chapter}[hang]{\Huge\bf}{\thechapter{. }}{0pt}{\Huge\bf}
+
+\graphicspath{ {./images/} }
 
 \hypersetup{pdftitle={tesi},pdfauthor={Andrei Laurentiu Lepadat}}
 
@@ -278,10 +281,33 @@ Gli obiettivi principali di questa fase sono molteplici.
 % describe experimental setting: hardware used, software used, data used, etc. ....
 Il software che implementa le funzionalit\`a qui presentate \`e stato scritto utilizzando diversi linguaggi di programmazione, tra cui principalmente Python e MATLAB.
 Il software utilizzato per ottenere dati provenienti da simulazioni di sistemi cyber-fisici \`e Simulink, un software per la simulazione e la modellazione di sistemi dinamici.
+La libreria sfruttata per quanto riguarda gli algoritmi Support Vector Machine \`e skikit-learn ([3]), basata su LibSVM ([4]).
 
+\newpage
 \section{Casi di studio}
 % describe here the case studies used in the experiments
 % car e climate 
+I due modelli di cui si \`e parlato rappresentano entrambi sottosistemi presenti in sistemi di trasporto.
+\begin{itemize}
+    \item Modello di un'automobile a tramissione automatica (Figura \ref{fig:1});
+    \item Modello di un sistema di controllo automatico del clima dell'ambiente interno di un'automobile (Figura \ref{fig:2}).
+\end{itemize}
+Nei diagrammi di entrambi i modelli, i rispettivi segnali di importanza per per questa fase sono stati segnati con un numero (ID del sensore) all'interno di un cerchio rosso e sono rispettivamente, 
+in ordine di apparizione, per il primo modello velocit\`a del veicolo e velocit\`a della trasmissione, e per il secondo modello le temperatura dell'abitacolo, la temperatura emessa dal climatizzatore e la temperatura $t$ che \`e prodotta come somma dei contributi di alcuni valori non rilevanti in questo contesto.
+
+\begin{sidewaysfigure}
+    \includegraphics[scale=0.38]{car.png}
+    \centering
+    \caption{Modello Simulink di un'automobile a trasmissione automatica.}
+    \label{fig:1}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}
+    \includegraphics[scale=0.45]{climate.png}
+    \centering
+    \caption{Modello Simulink di un sistema di controllo automatico del clima dell'ambiente interno di un'autovettura.}
+    \label{fig:2}
+\end{sidewaysfigure}
 
 \section{Correttezza}
 % describe here experiments aimed at showing correctness of your implementation
