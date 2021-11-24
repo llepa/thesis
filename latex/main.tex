@@ -12,6 +12,7 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 
+\usepackage{algorithmicx}
 \usepackage{titlesec}
 \titleformat{\chapter}[hang]{\Huge\bf}{\thechapter{. }}{0pt}{\Huge\bf}
 
@@ -126,7 +127,7 @@ dove $\hat{y}_k$ \`e l'output del filtro di Kalman.
 
 Detto ci\`o, per quantificare la bont\`a del modello del sistema, viene utilizzato l'\textit{Errore Quadratico Medio (RMSE)}, definito come
 \begin{equation}
-    RMSE = \sqrt{\frac{\sum_{i=1}^n (y_i - \hat{y}_i)}{n}}\label{eq:5}.
+    RMSE = \sqrt{\frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{n}}\label{eq:5}.
 \end{equation}
 Questa metrica rappresenta la distanza tra il valore stimato e quello misurato, ovvero quanto il primo \`e lontano dal secondo.
 Nella letteratura della teoria del controllo, modelli con un'accuratezza\footnote{Se l'RMSE rappresenta un errore, l'accuratezza viene calcolata come 100 - RMSE.} superiore al 70\% sono considerati accettabili approssimazioni della dinamica di sistemi reali.
@@ -196,7 +197,7 @@ Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un e
 
 % ----------------------------------------------------------------------------------------
 
-\chapter{Metodi}\label{chap:2}
+\chapter{Metodi}\label{chap:3}
 
 % Describe here the algorithm design from a math perspective. No code here.
 % Descrivere la suddivisione in chunks e come viene definito il modello di M.L.
@@ -210,7 +211,7 @@ Scegliere la giusta dimensione $d$ dei vari chunk \`e una scelta sensibile in qu
 L'idea \`e di avere chunk di serie temporali abbastanza grandi da catturare la dinamica del processo e piccoli abbastanza da ridurre il tempo di attesa per discriminare nuove misurazioni.
 
 Tutte le istanze di $X$ che appartengono allo stesso sensore determinano il fingerprint del sensore e il primo compito della funzione $f$ (Funzione \ref{eq:3}) \`e quello di distinguere correttamente i sensori, 
-quindi generare un fingerprint il pi\`u preciso e privo di ambiguit\`a possibile. Nel Capitolo \ref{chap:3}, l'esistenza del fingerprint verr\`a provata empiricamente.
+quindi generare un fingerprint il pi\`u preciso e privo di ambiguit\`a possibile. Nel Capitolo \ref{chap:5}, l'esistenza del fingerprint verr\`a provata empiricamente.
 
 L'algoritmo di M.L. utilizzato \`e il \textit{Support Vector Machine} (SVM), impiegato come un classificatore a 2 classi (One vs. One) che etichetta i dati provenienti dal legittimo sensore (\textit{ground truth}) come un \textit{1}
 e come \textit{0} i dati provenienti dagli altri sensori. In questo modo gli attacchi possono essere considerati come un tipo dato appartenente ad altre classi.
@@ -223,54 +224,60 @@ Nella fase di testing tutto ci\`o reputato estraneo viene considerato come un at
 
 % ----------------------------------------------------------------------------------------
 
-\chapter{Implementazione}
+\chapter{Implementazione}\label{chap:4}
 % describe here how you implemented the functionalities described in the methods section.
 % Use pseudo-code or diagrams.
 % Parlare del come si è implementato il rumore intrinseco in un modello symulink
-Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione del vettori dei residui, nel presente lavoro viene presa una strada diversa, alternativa e pi\`u semplice di quella presentata in [2].
+Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione dei vettori dei residui, nel presente lavoro viene presa una strada diversa da quella presentata in [1].
 
-Viene utilizzato un modello di sistema dinamico ideale (che non introduce alcun tipo di rumore nelle misurazioni dei sensori) e viene inserito il process noise ``artificialmente''.
+Viene utilizzato un modello di sistema dinamico ideale (che non introduce alcun tipo di rumore nelle misurazioni dei sensori) e viene inserito il process noise ``artificialmente'', sotto forma di rumore gaussiano.
 
 Sia $y_k$ l'output di un sistema del tipo definito in \ref{eq:4} all'istante $k$ e siano $\mathcal{X}_j \sim~\mathcal{N}(0,\sigma_j^2)$, $j = 1,\ldots,m$\footnote{{$m$ \`e la dimensione di $y_k$, uguale al numero di sensori del sistema.}}, $m$ (una per sensore) distribuzioni di probabilit\`a gaussiane con media nulla e varianza $\sigma_j^2$.
-Il valore $\bar{y}_k$ del sistema dopo l'introduzione di rumore \`e uguale a
+Il valore in output del sistema dopo l'introduzione di rumore \`e uguale a
 \begin{equation}
     \bar{y}_k = y_k + \delta_k\label{eq:6},
 \end{equation}
-dove $\delta_k$ \`e il vettore che contiene le $m$ estrazioni secondo $\mathcal{X}_j$.
+dove $\delta_k$ \`e il vettore che contiene le $m$ estrazioni secondo $\mathcal{X}_j$ all'istante $k$.
 
 Il vettore dei residui viene quindi ottenuto eseguendo la sottrazione vettoriale $r_j = \bar{y}_j - y_j$, in cui $y_j$ (la serie storica, ovvero la collezione, delle misurazioni relative al sensore $j$ all'istante $n$) agisce come il valore stimato secondo le dinamiche del sistema.
 Dal momento che ogni $r_j$ deve contenere valori di un sistema reale sottoposto a process noise, le varianze $\sigma_j^2$ devono essere tali che le distribuzioni $\mathcal{X}_j$ generino valori per $j=1,\ldots,m$, dalla \ref{eq:5}, tali che
 \begin{equation}
-    100 - \sqrt{\frac{\sum_{k=1}^n (\bar{y}_{j,k} - y_{j,k})}{n}} \geq D_j, \forall j\in\{1,\ldots,n\}\label{eq:7}.
+    100 - \sqrt{\frac{\sum_{k=1}^n (\bar{y}_{j,k} - y_{j,k})^2}{n}} \geq D_j, \forall j\in\{1,\ldots,n\}\label{eq:7}.
 \end{equation}
 $D_j$ \`e un valore sempre maggiore o uguale di 70 e, in base al ruolo del sensore all'interno del sistema, pu\`o assumere valori pi\`u o meno grandi.
-Sostituendo dall'Equazione \ref{eq:6}, si vede che l'RMSE per ogni sensore $j$ dipende banalmente dalla serie di valori estratti secondo $\mathcal{X}_j$.
+Sostituendo dall'Equazione \ref{eq:6}, si nota che l'RMSE per ogni sensore $j$ dipende banalmente dalla serie di valori estratti secondo $\mathcal{X}_j$.
 
-Calcolati i vettori dei residui e preparati (divisi in chunk ed estratte le feature) per essere processati dall'algoritmo SVM, 
-il modello risultante viene validato\footnote{Questa operazione ha una duplice funzionalit\`a: quella di validare il modello di M.L. trovato e quella di capire quanto il modello \`e sensibile allla quantit\`a di dati utilizzati nella fase di learning.}
+Calcolati i vettori dei residui e preparati (divisi in chunk ed estratte le feature) per essere processati dall'algoritmo SVM, e fatto il learning del modello di M.L., 
+quest'ultimo viene validato\footnote{Questa operazione, con un $k$ variabile, ha una duplice funzionalit\`a: quella di validare il modello di M.L. trovato e quella di capire quanto il modello \`e sensibile allla quantit\`a di dati utilizzati nella fase di learning.}
 tramite la k-fold cross validation con $k=2,\ldots,15$.
+Questo significa, per valori di $k$ crescenti, il dataset $D$ (per come \`e stato definito nel Capitolo \ref{chap:3}) viene suddiviso in $k$ partizioni e di queste, $k-1$ vengono utilizzate per fare il learning dell'algoritmo e una per fare il testing.
+In questo modo si cerca di evitare problemi di sovradattamento, tipico della suddivisione del dataset in due partizioni.
+Per ogni $k$, l'accuratezza finale del modello \`e data dalla media delle accuratezze calcolate durante le $k$ fasti di test.
+Dato che si vuole un modello di M.L. robusto nella dimensione del dataset, l'accuratezza di ognuna delle $k-1$ ($k = 2,\ldots,15$) esecuzioni della k-fold cross validation viene confrontata con le altre, e minore la variazione maggiore la robustezza del modello.
+
 % ----------------------------------------------------------------------------------------
 
-\chapter{Risultati sperimentali}\label{chap:3}
+\chapter{Risultati sperimentali}\label{chap:5}
 % describe the experimental results
-In questo capitolo vengono delineati gli obiettivi della fase sperimentale, il software utilizzato per simulare i sistemi e che produrr\`a i valori di output 
-che sono di interesse per questo lavoro. Vengono presentati di conseguenza due modelli che utilizzati come banco di prova per le tecniche descritte nel Capitolo \ref{chap:2}.
+Descritte le basi teoriche e metodologiche prese in considerazione, queste sono state implementate e testate per via software.
+In questo capitolo vengono delineati gli obiettivi della fase sperimentale, il software utilizzato per simulare i sistemi considerati e che quindi produce i valori di output 
+che sono punto centrale di questo lavoro. Vengono presentati di conseguenza due modelli utilizzati come banco di prova per le tecniche descritte nel Capitolo \ref{chap:3}.
 
 \section{Obiettivi}
 % describe here the objectives of the experimental activity: test correctness;
 % evaluate computational performances (CPU time and RAM); ....
-Gli obiettivi principali di questa fase sono molteplici:
+Gli obiettivi principali di questa fase sono molteplici.
 \begin{itemize}
     \item Provare l'esistenza del fingerprint relativo ai sensori e quindi della distinguibilit\`a dei dati provenienti da sensori diversi.
     \item Trovare la giusta dimensione dei chunk in cui saranno divisi i vettori dei residui.
-    \item Mostrare che la quantit\`a di dati di sensori acquisita non indice particolarmente sul fingerprint.
+    \item Mostrare che la quantit\`a di dati di sensori acquisita non incide particolarmente sul fingerprint.
     \item Definire la tipologia di attacchi che possono essere identificati e quindi valutare la precisione con cui vengono riconosciuti.
  \end{itemize}
 
 \section{Configurazione}
 % describe experimental setting: hardware used, software used, data used, etc. ....
-Il programma che implementa le funzionalit\`a qui presentate \`e stato scritto utilizzando diversi linguaggi di programmazione, tra cui principalmente Python e MATLAB.
-Il software utilizzato per ottenere dati provenienti da simulazioni di sistemi cyber-fisici \`e Simulink, un software per simulazione e modellazione di sistemi dinamici.
+Il software che implementa le funzionalit\`a qui presentate \`e stato scritto utilizzando diversi linguaggi di programmazione, tra cui principalmente Python e MATLAB.
+Il software utilizzato per ottenere dati provenienti da simulazioni di sistemi cyber-fisici \`e Simulink, un software per la simulazione e la modellazione di sistemi dinamici.
 
 \section{Casi di studio}
 % describe here the case studies used in the experiments
