@@ -13,7 +13,7 @@
 \usepackage{hyperref}
 \usepackage{rotating}
 
-\usepackage{algorithmicx}
+\usepackage{hypcap}
 \usepackage{titlesec}
 \titleformat{\chapter}[hang]{\Huge\bf}{\thechapter{. }}{0pt}{\Huge\bf}
 
@@ -21,7 +21,7 @@
 
 \hypersetup{pdftitle={tesi},pdfauthor={Andrei Laurentiu Lepadat}}
 
-\title{Using Sensor and Process Noise Fingerprint to Detect Cyber Attacks in CPS}
+\title{Utilizzo di Sensori e Process Noise Fingerprint per il Rilevamento di Cyber-Attacchi in CPS}
 \author{Andrei Laurentiu Lepadat}
 \IDnumber{1677093}
 \course{Informatica}
@@ -306,46 +306,119 @@ in ordine di apparizione, per il primo modello velocit\`a del veicolo e velocit\
     \label{fig:3}
 \end{figure}
 
+\begin{table}[htb]
+    \begin{center}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Dimensione Chunk / Sensore} & \textbf{1} & \textbf{2} \\
+        \hline
+        5 & 0.879 & 0.772 \\
+        \hline
+        10 & 0.946 & 0.909 \\
+        \hline
+        15 & 0.960 & 0.945 \\
+        \hline
+        20 & 0.978 & 0.977 \\
+        \hline
+        25 & 0.992 & 0.988 \\
+        \hline
+        30 & 0.996 & 0.992 \\
+        \hline
+        35 & 1.000 & 0.995 \\
+        \hline
+        40 & 0.997 & 1.000 \\
+        \hline
+        45 & 1.000 & 1.000 \\
+        \hline
+        50 & 1.000 & 0.993 \\
+        \hline
+        55 & 1.000 & 1.000 \\
+        \hline
+    \end{tabular}
+    \end{center}
+    \caption{Dimensione dei chunk differenti e accuratezza del classificatore per il modello di un'automobile a cambio automatico.}
+    \label{tab:2}
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{Dimensione Chunk / Sensore} & \textbf{1} & \textbf{2} & \textbf{3} \\
+        \hline
+        5 & 0.785 & 0.561 & 0.748 \\
+        \hline
+        10 & 0.850 & 0.723 & 0.906 \\
+        \hline
+        15 & 0.882 & 0.793 & 0.963 \\
+        \hline
+        20 & 0.910 & 0.855 & 0.979 \\
+        \hline
+        25 & 0.911 & 0.894 & 0.990 \\
+        \hline
+        30 & 0.940 & 0.930 & 0.995 \\
+        \hline
+        35 & 0.958 & 0.930 & 0.996 \\
+        \hline
+        40 & 0.969 & 0.946 & 0.998 \\
+        \hline
+        45 & 0.976 & 0.957 & 1.000 \\
+        \hline
+        50 & 0.980 & 0.969 & 1.000 \\
+        \hline
+        55 & 0.984 & 0.984 & 1.000 \\
+        \hline
+        60 & 0.991 & 0.985 & 1.000 \\
+        \hline
+        65 & 0.986 & 0.980 & 0.998 \\
+        \hline
+        70 & 0.991 & 0.983 & 0.998 \\
+        \hline
+        75 & 0.993 & 0.983 & 1.000 \\
+        \hline
+        80 & 0.998 & 0.993 & 1.000 \\
+        \hline
+        85 & 0.995 & 1.000 & 1.000 \\
+        \hline
+        90 & 0.997 & 0.995 & 1.000 \\
+        \hline
+        95 & 1.000 & 0.997 & 1.000 \\
+        \hline
+        100 & 0.997 & 0.991 & 1.000 \\
+        \hline
+    \end{tabular}
+    \end{center}
+    \caption{Dimensione dei chunk differenti e accuratezza del classificatore per il modello del controllo automatico del clima di un'automobile.}
+    \label{tab:3}
+\end{table}
+
 Si vuole ora provare alcuni dei punti anticipati nella Sezione \ref{sec:1}.
 Nella Figura \ref{fig:3} possiamo vedere la rappresentazione grafica delle feature statistiche dei vettori dei residui dei due sensori che appartengono al modello in Figura \ref{fig:1}.
 \`E facile individuare i due fingerprint, questo ci d\`a un'idea di come il profilo del rumore sia una peculiarit\`a di ogni sensore. Nell'esempio proposto vengono utilizzate tre feature, nello specifico media, varianza e deviazione media assoluta.
 
-Come gi\`a detto in precedenza, per catturare le giuste dinamiche del sistema, vi \`e la necessit\`a di suddividere il dataset in blocchi, e questi non devono avere una dimensione tale da non ritardare eccessivamente l'intervallo di tempo che deve passare affinch\'e un attacco venga identificato.
+Come gi\`a detto in precedenza, per catturare le giuste dinamiche del sistema, vi \`e la necessit\`a di suddividere il dataset in blocchi, e questi non devono avere una dimensione tale da non allungare eccessivamente l'intervallo di tempo che deve passare affinch\'e un attacco venga identificato.
 
-Nel caso del primo sistema, un modello SVM viene iterativamente allenato e testato con chunk che hanno una dimensione crescente, da 5 misurazioni a 55, con step di 5.
+Nel caso del primo modello, il modello SVM viene allenato e testato con dataset composti da feature estratte da chunk che hanno una dimensione variabile e crescente tra un'esecuzione e la successiva. La dimensione dei chunk va da un minimo di 5 fino ad un massimo di 55 misurazioni, con un incremento di 5.
+Come si pu\`o vedere dalla Tabella \ref{tab:2} l'accuratezza del classificatore converge verso valori molto vicini ad 1 per chunk di dimensioni maggiore di 25.
+Un valore ragionevole potrebbe essere uno tra 25 e 30 in quanto hanno un buonissimo livello di accuratezza ma mantengono una dimensione dei chunk molto ridotta.
+La scelta che \`e stata fatta \`e quella di prendere come dimensione dei blocchi 25, in quanto il primo modello ha un sample time di $\frac{1}{25}$ secondi e questo permetterebbe di estrarre le feature dal chunk ogni secondo.
+Se fosse stata scelta una dimensione di 30 avremmo ottenuto risultati poco differenti.
 
-\begin{table}[tb]
+Nel caso del secondo modello, il modello SVM viene allenato e testato con una dimensione dei chunk che va 5 a 100, con un incremento di 5.
+I risultati sperimentali sono mostrati nella Tabella \ref{tab:3} e si pu\`o notare che il classificatore raggiunge un'accuratezza per chunk con una dimensione di 80.
+Dato che il sample time del modello \`e di 1 secondo, significa che per poter estrarre le feature dai chunk bisogna attendere 80 secondi.
+
+
+\begin{table}[htb]
     \begin{center}
-    \begin{tabular}{|c|c|c|}
-    \hline
-    \textbf{Dimensione Chunk / Sensore} & \textbf{1} & \textbf{2} \\
-    \hline
-    5 & 0.879 & 0.772 \\
-    \hline
-    10 & 0.946 & 0.909 \\
-    \hline
-    15 & & \\
-    \hline
-    20 & & \\
-    \hline
-    25 & & \\
-    \hline
-    30 & & \\
-    \hline
-    35 & & \\
-    \hline
-    40 & & \\
-    \hline
-    45 & & \\
-    \hline
-    50 & & \\
-    \hline
-    55 & & \\
-    \hline
-    \end{tabular}
-    \end{center}
-    \caption{}
-    \label{tab:2}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Split} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{11} & \textbf{12} & \textbf{13} & \textbf{14} & \textbf{15} \\
+        \hline
+        \textbf{Accuratezza} & 0.987 & 0.988 & 0.988 & 0.987 & 0.987 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 \\
+        \hline
+    \end{tabular}}
+    \end{center}   
+    \caption{Risultati, relativi al primo modello, della k-fold cross validation per diversi valori di k.} 
+    \label{tab:4}
 \end{table}
 
 \section{Valutazione computazionale} % probabilmente da rimuovere
@@ -357,14 +430,14 @@ Nel caso del primo sistema, un modello SVM viene iterativamente allenato e testa
 % For example, software to detect adversarial attacks will be evaluated here showing how good (or bad) it is in detecting attcks.
 % Parlare della grandezza dei chunks trovati
 
-\begin{sidewaysfigure}
+\begin{sidewaysfigure}[b]
     \includegraphics[scale=0.38]{car.png}
     \centering
     \caption{Modello Simulink di un'automobile a trasmissione automatica.}
     \label{fig:1}
 \end{sidewaysfigure}
 
-\begin{sidewaysfigure}
+\begin{sidewaysfigure}[b]
     \includegraphics[scale=0.45]{climate.png}
     \centering
     \caption{Modello Simulink di un sistema di controllo automatico del clima dell'ambiente interno di un'autovettura.}
