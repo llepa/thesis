@@ -21,7 +21,7 @@
 
 \hypersetup{pdftitle={tesi},pdfauthor={Andrei Laurentiu Lepadat}}
 
-\title{Utilizzo di Sensori e Process Noise Fingerprint per il Rilevamento di Cyber-Attacchi in CPS}
+\title{Utilizzo di Sensor Noise Fingerprint per il Rilevamento di Cyber-Attacchi in CPS}
 \author{Andrei Laurentiu Lepadat}
 \IDnumber{1677093}
 \course{Informatica}
@@ -88,7 +88,7 @@ I dati che vengono rilevati dai sensori spesso vengono memorizzati localmente e/
 come nel lavoro qui presentato, per fini paralleli o trasversali a quelli per cui sono stati installati.
 Una sequenza di dati estratti da sensori ordinata temporalmente viene chiamata \textit{serie temporale} (\textit{time-series} in inglese).
 
-Comunemente i sensori sono imperfetti per costruzione e trasportano intrinsecamente un'incertezza (\textit{process noise}) che influenza le misurazioni da essi compiute.
+Comunemente i sensori sono imperfetti per costruzione e contengono intrinsecamente un'incertezza (\textit{rumore}) nelle misurazioni che eseguono, dovuta a imperfezioni di fabbricazione.
 Sia 
 \begin{equation}
 \bar{y}_{k} = y_{k} + \delta_{k}\label{eq:1}
@@ -198,16 +198,38 @@ e \textit{supervised}, cio\'e in cui il datasert \`e del tipo
 \end{equation}
 Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un elemento di $Y$, cio\`e la classe $C_i$ di appartenenza.
 
+Sia $\hat{f}$ la funzione che approssima $f$. L'errore di $\hat{f}$ rispetto ad $S \subset X$ \`e uguale alla proporzione con cui $\hat{f}$ classifica erroneamente, ovvero
+\begin{equation}
+    error_{S}(\hat{f}) = \frac{1}{n} \sum_{x\in S} \phi(\hat{f}(x), f(x)),
+\end{equation}
+dove
+\begin{equation}
+    \phi(\hat{f}(x), f(x)) = \left\{
+        \begin{array}{rl}
+            0 & \mbox{se $ \hat{f}(x) \ne f(x)$}\\
+            1 & \mbox{altrimenti}
+        \end{array}
+    \right
+    .
+\end{equation}
+L'accuratezza di $\hat{f}$ \`e ugale a
+\begin{equation}
+    accuracy(\hat{f}) = 1 - error(\hat{f}).
+\end{equation}
+In seguito, questa metrica verr\`a utilizzata spesso per determinare la bont\`a del classificatore trovato.
+
 % ----------------------------------------------------------------------------------------
 
 \chapter{Metodi}\label{chap:3}
 
 % Describe here the algorithm design from a math perspective. No code here.
 % Descrivere la suddivisione in chunks e come viene definito il modello di M.L.
-Come anticipato nella precedente sezione, il prossimo passo \`e quello di definire correttamente il problema di M.L. ed utilizzare un algoritmo di learning adeguato.
+Come anticipato nel precedente capitolo, il prossimo passo \`e quello di definire correttamente il problema di M.L. ed utilizzare un algoritmo di learning adeguato.
 A questo scopo bisogna preparare i dati estratti dai sensori (e di conseguenza il vettore dei residui) per poter essere utilizzati efficacemente dall'algoritmo di learning.
-Il dataset conterr\`a coppie in cui il primo elemento $x_i$ \`e un vettore le feature elencate nella Tabella \ref{tab:1}, e il secondo elemento $y_i$ \`e la classe di apparteneza che rappresenta il sensore che ha prodotto le misurazioni utilizzate per costruire $x_i$.
-Data la natura statistica delle feature utilizzate, sarebbe inadeguato estrarre le stesse basandosi solamente sulla misurazione avvenuto all'istante di tempo $k$.
+
+Il dataset contiene coppie in cui il primo elemento $x_i$ \`e un vettore che contiene le feature elencate nella Tabella \ref{tab:1}, e il secondo elemento $y_i$ \`e la classe di apparteneza che rappresenta il sensore che ha prodotto le misurazioni utilizzate per costruire $x_i$.
+
+Data la natura statistica delle feature utilizzate, sarebbe inadeguato estrarre le stesse basandosi solamente sulla misurazione avvenuto all'istante di tempo $k$\footnote{Estrarre delle feature come media e varianza da un'unica misurazione non ha senso in quanto la media equivarrebbe al valore stesso e la varianza sarebbe necessariamente nulla.}.
 Detto ci\`o, bisogna partizionare ogni serie temporale in blocchetti (\textit{chunk}) di dimensione $d$. 
 Da ogni chunk verranno poi estratte le feature precedentemente menzionate ed etichettate con la classe (quindi sensore) di appartenenza.
 Scegliere la giusta dimensione $d$ dei vari chunk \`e una scelta sensibile in quanto forzer\`a anche la dimensione dei chunk composti da residui di sensori che verranno calcolati durante il normale funzionamento del sistema.
@@ -231,9 +253,9 @@ Nella fase di testing tutto ci\`o reputato estraneo viene considerato come un at
 % describe here how you implemented the functionalities described in the methods section.
 % Use pseudo-code or diagrams.
 % Parlare del come si è implementato il rumore intrinseco in un modello symulink
-Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione dei vettori dei residui, nel presente lavoro viene presa una strada diversa da quella presentata in [1].
+Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione dei vettori dei residui, nel presente lavoro viene presa una strada alternativa e pi\`u semplice di quella presentata in [1].
 
-Viene utilizzato un modello di sistema dinamico ideale (che non introduce alcun tipo di rumore nelle misurazioni dei sensori) e viene inserito il process noise ``artificialmente'', sotto forma di rumore gaussiano.
+Viene utilizzato un modello di sistema dinamico ideale, che non produce a livello delle misurazioni dei sensori alcun tipo di rumore. Successivamente, il rumore viene inserito ``artificialmente'', sotto forma di rumore gaussiano.
 
 Sia $y_k$ l'output di un sistema del tipo definito in \ref{eq:4} all'istante $k$ e siano $\mathcal{X}_j \sim~\mathcal{N}(0,\sigma_j^2)$, $j = 1,\ldots,m$\footnote{{$m$ \`e la dimensione di $y_k$, uguale al numero di sensori del sistema.}}, $m$ (una per sensore) distribuzioni di probabilit\`a gaussiane con media nulla e varianza $\sigma_j^2$.
 Il valore in output del sistema dopo l'introduzione di rumore \`e uguale a
@@ -243,7 +265,7 @@ Il valore in output del sistema dopo l'introduzione di rumore \`e uguale a
 dove $\delta_k$ \`e il vettore che contiene le $m$ estrazioni secondo $\mathcal{X}_j$ all'istante $k$.
 
 Il vettore dei residui viene quindi ottenuto eseguendo la sottrazione vettoriale $r_j = \bar{y}_j - y_j$, in cui $y_j$ (la serie storica, ovvero la collezione, delle misurazioni relative al sensore $j$ all'istante $n$) agisce come il valore stimato secondo le dinamiche del sistema.
-Dal momento che ogni $r_j$ deve contenere valori di un sistema reale sottoposto a process noise, le varianze $\sigma_j^2$ devono essere tali che le distribuzioni $\mathcal{X}_j$ generino valori per $j=1,\ldots,m$, dalla \ref{eq:5}, tali che
+Dal momento che ogni $r_j$ deve contenere valori di un sistema reale sottoposto a sensor noise, le varianze $\sigma_j^2$ devono essere tali che le distribuzioni $\mathcal{X}_j$ generino valori per $j=1,\ldots,m$, dalla \ref{eq:5}, tali che
 \begin{equation}
     100 - \sqrt{\frac{\sum_{k=1}^n (\bar{y}_{j,k} - y_{j,k})^2}{n}} \geq D_j, \forall j\in\{1,\ldots,n\}\label{eq:7}.
 \end{equation}
@@ -253,7 +275,7 @@ Sostituendo dall'Equazione \ref{eq:6}, si nota che l'RMSE per ogni sensore $j$ d
 Calcolati i vettori dei residui e preparati (divisi in chunk ed estratte le feature) per essere processati dall'algoritmo SVM, e fatto il learning del modello di M.L., 
 quest'ultimo viene validato\footnote{Questa operazione, con un $k$ variabile, ha una duplice funzionalit\`a: quella di validare il modello di M.L. trovato e quella di capire quanto il modello \`e sensibile allla quantit\`a di dati utilizzati nella fase di learning.}
 tramite la k-fold cross validation con $k=2,\ldots,15$.
-Questo significa, per valori di $k$ crescenti, il dataset $D$ (per come \`e stato definito nel Capitolo \ref{chap:3}) viene suddiviso in $k$ partizioni e di queste, $k-1$ vengono utilizzate per fare il learning dell'algoritmo e una per fare il testing.
+Questo significa, per valori di $k$ crescenti, il dataset $D$ (per come \`e stato definito nel Capitolo \ref{chap:3}) viene suddiviso in $k$ partizioni e di queste, $k-1$ vengono utilizzate per fare il training e una per il testing.
 In questo modo si cerca di evitare problemi di sovradattamento, tipico della suddivisione del dataset in due partizioni.
 Per ogni $k$, l'accuratezza finale del modello \`e data dalla media delle accuratezze calcolate durante le $k$ fasti di test.
 Dato che si vuole un modello di M.L. robusto nella dimensione del dataset, l'accuratezza di ognuna delle $k-1$ ($k = 2,\ldots,15$) esecuzioni della k-fold cross validation viene confrontata con le altre, e minore la variazione maggiore la robustezza del modello.
@@ -394,33 +416,50 @@ Nella Figura \ref{fig:3} possiamo vedere la rappresentazione grafica delle featu
 \`E facile individuare i due fingerprint, questo ci d\`a un'idea di come il profilo del rumore sia una peculiarit\`a di ogni sensore. Nell'esempio proposto vengono utilizzate tre feature, nello specifico media, varianza e deviazione media assoluta.
 
 Come gi\`a detto in precedenza, per catturare le giuste dinamiche del sistema, vi \`e la necessit\`a di suddividere il dataset in blocchi, e questi non devono avere una dimensione tale da non allungare eccessivamente l'intervallo di tempo che deve passare affinch\'e un attacco venga identificato.
-
-Nel caso del primo modello, il modello SVM viene allenato e testato con dataset composti da feature estratte da chunk che hanno una dimensione variabile e crescente tra un'esecuzione e la successiva. La dimensione dei chunk va da un minimo di 5 fino ad un massimo di 55 misurazioni, con un incremento di 5.
+Nel caso del primo modello, il modello SVM viene allenato e validato con dataset composti da feature estratte da chunk che hanno una dimensione variabile e crescente tra un'esecuzione e la successiva. La dimensione dei chunk va da un minimo di 5 fino ad un massimo di 55 misurazioni, con un incremento di 5.
 Come si pu\`o vedere dalla Tabella \ref{tab:2} l'accuratezza del classificatore converge verso valori molto vicini ad 1 per chunk di dimensioni maggiore di 25.
-Un valore ragionevole potrebbe essere uno tra 25 e 30 in quanto hanno un buonissimo livello di accuratezza ma mantengono una dimensione dei chunk molto ridotta.
-La scelta che \`e stata fatta \`e quella di prendere come dimensione dei blocchi 25, in quanto il primo modello ha un sample time di $\frac{1}{25}$ secondi e questo permetterebbe di estrarre le feature dal chunk ogni secondo.
+Un valore ragionevole potrebbe essere uno tra 25 e 30 in quanto hanno un buonissimo livello di accuratezza ma mantengono una dimensione abbastanza ridotta.
+La scelta che \`e stata fatta \`e quella di prendere come dimensione dei blocchi 25, in quanto il modello ha un sample time di $\frac{1}{25}$ secondi e questo permetterebbe di estrarre le feature dal chunk ogni secondo.
 Se fosse stata scelta una dimensione di 30 avremmo ottenuto risultati poco differenti.
 
-Nel caso del secondo modello, il modello SVM viene allenato e testato con una dimensione dei chunk che va 5 a 100, con un incremento di 5.
+Nel caso del secondo modello, il modello SVM viene allenato e validato con una dimensione dei chunk che va 5 a 100, con un incremento di 5.
 I risultati sperimentali sono mostrati nella Tabella \ref{tab:3} e si pu\`o notare che il classificatore raggiunge un'accuratezza per chunk con una dimensione di 80.
 Dato che il sample time del modello \`e di 1 secondo, significa che per poter estrarre le feature dai chunk bisogna attendere 80 secondi.
-
 
 \begin{table}[htb]
     \begin{center}
     \resizebox{\textwidth}{!}{
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
         \hline
-        \textbf{Split} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{11} & \textbf{12} & \textbf{13} & \textbf{14} & \textbf{15} \\
+        \textbf{Split} & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 \\
+        \hline
+        \textbf{Accuratezza} & 0.989 & 0.989 & 0.990 & 0.990 & 0.990 & 0.990 & 0.990 & 0.990 & 0.990 & 0.990 & 0.991 & 0.990 & 0.990 & 0.990 \\
+        \hline
+    \end{tabular}}
+    \end{center}   
+    \caption{Risultati, relativi al primo modello, della k-fold cross validation per diversi valori di k, con dimensione dei chunk uguale a 25.} 
+    \label{tab:4}
+    \begin{center}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Split} & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 \\
         \hline
         \textbf{Accuratezza} & 0.987 & 0.988 & 0.988 & 0.987 & 0.987 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 & 0.988 \\
         \hline
     \end{tabular}}
-    \end{center}   
-    \caption{Risultati, relativi al primo modello, della k-fold cross validation per diversi valori di k.} 
-    \label{tab:4}
+    \end{center}
+    \caption{Risultati, relativi al secondo modello, della k-fold cross validation per diversi valori di k, con dimensione dei chunk uguale a 80.}
+    \label{tab:5}
 \end{table}
 
+Ora, con l'obiettivo di mostrare il comportamento del classificatore al variare della dimensione del dataset si valutano i risultati  forniti dalla cross validation.
+Entrambi i modelli vengono simulati per un determinato tempo per permettere la raccolta dei dati. Anche in questa situazione bisogna trovare un giusto compromesso in quanto 
+si cerca di raggiungere tutti gli stati del sistema affinché la probabilit\`a che durante il periodo di vita del sistema (in cui si potrebbero verificare attacchi) ci siano falsi positivi (stati non raggiunti durante la simulazione raggiunti poi durante il normale funzionamento del sistema) sia il pi\`u bassa possibile.
+
+Le simulazioni hanno una durata di 24 ore e 12 ore, rispettivamente per il primo e il secondo modello.
+I risultati della cross validation, per differenti valori di k, vengono mostrati nella Tabella \ref{tab:4} per il primo modello e nella Tabella \ref{tab:5} per il secondo.
+Si pu\`o notare che il classificatore \`e robusto e mostra che non \`e importante quale range delle serie temporali vengono utilizzate per il trainign e il testing .
 \section{Valutazione computazionale} % probabilmente da rimuovere
 % describe here experiments aimed at evaluating computational performance (e.g., CPU usage, RMA usage, etc)
 
