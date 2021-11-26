@@ -17,6 +17,9 @@
 \usepackage{titlesec}
 \titleformat{\chapter}[hang]{\Huge\bf}{\thechapter{. }}{0pt}{\Huge\bf}
 
+\newcommand{\RomanNumeralCaps}[1]
+    {\MakeUppercase{\romannumeral #1}}
+
 \graphicspath{ {./images/} }
 
 \hypersetup{pdftitle={tesi},pdfauthor={Andrei Laurentiu Lepadat}}
@@ -159,21 +162,21 @@ Queste feature sono mostrate nella Tabella \ref{tab:1}.
 
 \begin{table}[tb]
     \begin{center}
-    \begin{tabular}{|l|l|}
-    \hline
-    \textbf{Feature} & \textbf{Descrizione} \\
-    \hline
-    Media & $\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$ \\
-    \hline
-    Varianza & $\sigma = \frac{1}{N}\sum_{i=1}^N (x_i - \bar{x})^2 $ \\
-    \hline
-    Dev. Med. Ass. & $D_{\bar{x}} = \frac{1}{N}\sum_{i=1}^N |x_i - \bar{x}|$ \\
-    \hline
-    Asimmetria & $\gamma = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^3 $ \\
-    \hline
-    Curtosi & $ \beta = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^4 - 3$\\
-    \hline
-    \end{tabular}
+        \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Feature} & \textbf{Descrizione} \\
+        \hline
+        Media & $\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$ \\
+        \hline
+        Varianza & $\sigma = \frac{1}{N}\sum_{i=1}^N (x_i - \bar{x})^2 $ \\
+        \hline
+        Dev. Med. Ass. & $D_{\bar{x}} = \frac{1}{N}\sum_{i=1}^N |x_i - \bar{x}|$ \\
+        \hline
+        Asimmetria & $\gamma = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^3 $ \\
+        \hline
+        Curtosi & $ \beta = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^4 - 3$\\
+        \hline
+        \end{tabular}
     \end{center}
     \caption{Lista delle feature utilizzate; $x$ \`e la serie temporale di dimensione $N$ proveniente dal sensore.}
     \label{tab:1}
@@ -293,6 +296,7 @@ che sono punto centrale di questo lavoro. Vengono presentati di conseguenza due 
 % evaluate computational performances (CPU time and RAM); ....
 Gli obiettivi principali di questa fase sono molteplici.
 \begin{itemize}
+    \item Trovare la giusta varianza del rumore gaussiano introdotto nei sensori.
     \item Mostrare l'esistenza del fingerprint.
     \item Trovare la giusta dimensione dei chunk in cui saranno divisi i vettori dei residui.
     \item Mostrare che la quantit\`a di dati di sensori acquisita non incide particolarmente sul fingerprint.
@@ -328,92 +332,120 @@ in ordine di apparizione, per il primo modello velocit\`a del veicolo e velocit\
     \label{fig:3}
 \end{figure}
 
-\begin{table}[htb]
+\begin{table}
     \begin{center}
-    \begin{tabular}{|c|c|c|}
-        \hline
-        \textbf{Dimensione Chunk / Sensore} & \textbf{1} & \textbf{2} \\
-        \hline
-        5 & 0.879 & 0.772 \\
-        \hline
-        10 & 0.946 & 0.909 \\
-        \hline
-        15 & 0.960 & 0.945 \\
-        \hline
-        20 & 0.978 & 0.977 \\
-        \hline
-        25 & 0.992 & 0.988 \\
-        \hline
-        30 & 0.996 & 0.992 \\
-        \hline
-        35 & 1.000 & 0.995 \\
-        \hline
-        40 & 0.997 & 1.000 \\
-        \hline
-        45 & 1.000 & 1.000 \\
-        \hline
-        50 & 1.000 & 0.993 \\
-        \hline
-        55 & 1.000 & 1.000 \\
-        \hline
-    \end{tabular}
+        \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{Dimensione Chunk / Sensore} & \textbf{1} & \textbf{2} \\
+            \hline
+            5 & 0.879 & 0.772 \\
+            \hline
+            10 & 0.946 & 0.909 \\
+            \hline
+            15 & 0.960 & 0.945 \\
+            \hline
+            20 & 0.978 & 0.977 \\
+            \hline
+            25 & 0.992 & 0.988 \\
+            \hline
+            30 & 0.996 & 0.992 \\
+            \hline
+            35 & 1.000 & 0.995 \\
+            \hline
+            40 & 0.997 & 1.000 \\
+            \hline
+            45 & 1.000 & 1.000 \\
+            \hline
+            50 & 1.000 & 0.993 \\
+            \hline
+            55 & 1.000 & 1.000 \\
+            \hline
+        \end{tabular}
     \end{center}
     \caption{Dimensione dei chunk differenti e accuratezza del classificatore per il modello di un'automobile a cambio automatico.}
     \label{tab:2}
     \begin{center}
-    \begin{tabular}{|c|c|c|c|}
-        \hline
-        \textbf{Dimensione Chunk / Sensore} & \textbf{1} & \textbf{2} & \textbf{3} \\
-        \hline
-        5 & 0.785 & 0.561 & 0.748 \\
-        \hline
-        10 & 0.850 & 0.723 & 0.906 \\
-        \hline
-        15 & 0.882 & 0.793 & 0.963 \\
-        \hline
-        20 & 0.910 & 0.855 & 0.979 \\
-        \hline
-        25 & 0.911 & 0.894 & 0.990 \\
-        \hline
-        30 & 0.940 & 0.930 & 0.995 \\
-        \hline
-        35 & 0.958 & 0.930 & 0.996 \\
-        \hline
-        40 & 0.969 & 0.946 & 0.998 \\
-        \hline
-        45 & 0.976 & 0.957 & 1.000 \\
-        \hline
-        50 & 0.980 & 0.969 & 1.000 \\
-        \hline
-        55 & 0.984 & 0.984 & 1.000 \\
-        \hline
-        60 & 0.991 & 0.985 & 1.000 \\
-        \hline
-        65 & 0.986 & 0.980 & 0.998 \\
-        \hline
-        70 & 0.991 & 0.983 & 0.998 \\
-        \hline
-        75 & 0.993 & 0.983 & 1.000 \\
-        \hline
-        80 & 0.998 & 0.993 & 1.000 \\
-        \hline
-        85 & 0.995 & 1.000 & 1.000 \\
-        \hline
-        90 & 0.997 & 0.995 & 1.000 \\
-        \hline
-        95 & 1.000 & 0.997 & 1.000 \\
-        \hline
-        100 & 0.997 & 0.991 & 1.000 \\
-        \hline
-    \end{tabular}
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+            \textbf{Dimensione Chunk / Sensore} & \textbf{1} & \textbf{2} & \textbf{3} \\
+            \hline
+            5 & 0.785 & 0.561 & 0.748 \\
+            \hline
+            10 & 0.850 & 0.723 & 0.906 \\
+            \hline
+            15 & 0.882 & 0.793 & 0.963 \\
+            \hline
+            20 & 0.910 & 0.855 & 0.979 \\
+            \hline
+            25 & 0.911 & 0.894 & 0.990 \\
+            \hline
+            30 & 0.940 & 0.930 & 0.995 \\
+            \hline
+            35 & 0.958 & 0.930 & 0.996 \\
+            \hline
+            40 & 0.969 & 0.946 & 0.998 \\
+            \hline
+            45 & 0.976 & 0.957 & 1.000 \\
+            \hline
+            50 & 0.980 & 0.969 & 1.000 \\
+            \hline
+            55 & 0.984 & 0.984 & 1.000 \\
+            \hline
+            60 & 0.991 & 0.985 & 1.000 \\
+            \hline
+            65 & 0.986 & 0.980 & 0.998 \\
+            \hline
+            70 & 0.991 & 0.983 & 0.998 \\
+            \hline
+            75 & 0.993 & 0.983 & 1.000 \\
+            \hline
+            80 & 0.998 & 0.993 & 1.000 \\
+            \hline
+            85 & 0.995 & 1.000 & 1.000 \\
+            \hline
+            90 & 0.997 & 0.995 & 1.000 \\
+            \hline
+            95 & 1.000 & 0.997 & 1.000 \\
+            \hline
+            100 & 0.997 & 0.991 & 1.000 \\
+            \hline
+        \end{tabular}
     \end{center}
     \caption{Dimensione dei chunk differenti e accuratezza del classificatore per il modello del controllo automatico del clima di un'automobile.}
     \label{tab:3}
 \end{table}
 
 Si vuole ora provare alcuni dei punti anticipati nella Sezione \ref{sec:1}.
-Nella Figura \ref{fig:3} possiamo vedere la rappresentazione grafica delle feature statistiche dei vettori dei residui dei due sensori che appartengono al modello in Figura \ref{fig:1}.
-\`E facile individuare i due fingerprint, questo ci d\`a un'idea di come il profilo del rumore sia una peculiarit\`a di ogni sensore. Nell'esempio proposto vengono utilizzate tre feature, nello specifico media, varianza e deviazione media assoluta.
+
+\begin{table}
+    \begin{center}
+        \begin{tabular}{|c|c|}
+            \hline
+            \RomanNumeralCaps{1} Modello & \RomanNumeralCaps{2} Modello \\
+            \hline
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \textbf{Sensore} & 1 & 2 \\
+                \hline
+                \textbf{Varianza} & 390 & 100 \\
+            \end{tabular} &
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \textbf{Sensore} & 1 & 2 & 3 \\
+                \hline
+                \textbf{Varianza} & 9.2 & 4.2 & 1 \\
+            \end{tabular} \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Valori della varianza delle distribuzioni associate ai sensori dei due modelli considerati.}
+    \label{tab:6}
+\end{table}
+
+Alla luce di quanto detto nella Sezione \ref{sec:1}, per quanto riguarda l'introduzione del rumore gaussiano nei sensori, 
+sono state trovate empiricamente le varianze delle distrubizioni tale che valga l'Equazione \ref{eq:7}.
+Nella Tabella \ref{tab:6} possiamo vedere i valori per entrambi i modelli.
+
+Nella Figura \ref{fig:3} vedere invece la rappresentazione grafica delle feature statistiche dei vettori dei residui dei due sensori che appartengono al modello in Figura \ref{fig:1}.
+\`E facile in questo modo intuire significato del fingerprint, questo ci d\`a un'idea di come il profilo del rumore sia una peculiarit\`a di ogni sensore. Nell'esempio proposto vengono utilizzate tre feature, nello specifico media, varianza e deviazione media assoluta.
 
 Come gi\`a detto in precedenza, per catturare le giuste dinamiche del sistema, vi \`e la necessit\`a di suddividere il dataset in blocchi, e questi non devono avere una dimensione tale da non allungare eccessivamente l'intervallo di tempo che deve passare affinch\'e un attacco venga identificato.
 Nel caso del primo modello, il modello SVM viene allenato e validato con dataset composti da feature estratte da chunk che hanno una dimensione variabile e crescente tra un'esecuzione e la successiva. La dimensione dei chunk va da un minimo di 5 fino ad un massimo di 55 misurazioni, con un incremento di 5.
@@ -426,7 +458,7 @@ Nel caso del secondo modello, il modello SVM viene allenato e validato con una d
 I risultati sperimentali sono mostrati nella Tabella \ref{tab:3} e si pu\`o notare che il classificatore raggiunge un'accuratezza per chunk con una dimensione di 80.
 Dato che il sample time del modello \`e di 1 secondo, significa che per poter estrarre le feature dai chunk bisogna attendere 80 secondi.
 
-\begin{table}[htb]
+\begin{table}
     \begin{center}
     \resizebox{\textwidth}{!}{
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
@@ -460,7 +492,8 @@ si cerca di raggiungere tutti gli stati del sistema affinché la probabilit\`a c
 Le simulazioni hanno una durata di 24 ore e 12 ore, rispettivamente per il primo e il secondo modello.
 I risultati della cross validation, per differenti valori di k, vengono mostrati nella Tabella \ref{tab:4} per il primo modello e nella Tabella \ref{tab:5} per il secondo.
 Si pu\`o notare che il classificatore \`e robusto e mostra che non \`e importante quale range delle serie temporali vengono utilizzate per il trainign e il testing .
-\section{Valutazione computazionale} % probabilmente da rimuovere
+
+% \section{Valutazione computazionale} % probabilmente da rimuovere
 % describe here experiments aimed at evaluating computational performance (e.g., CPU usage, RMA usage, etc)
 
 
