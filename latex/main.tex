@@ -419,6 +419,7 @@ Si vuole ora provare alcuni dei punti anticipati nella Sezione \ref{sec:1}.
 
 \begin{table}
     \begin{center}
+        \resizebox{\textwidth}{!}{
         \begin{tabular}{|c|c|}
             \hline
             \RomanNumeralCaps{1} Modello & \RomanNumeralCaps{2} Modello \\
@@ -427,14 +428,18 @@ Si vuole ora provare alcuni dei punti anticipati nella Sezione \ref{sec:1}.
                 \textbf{Sensore} & 1 & 2 \\
                 \hline
                 \textbf{Varianza} & 390 & 100 \\
+                \hline
+                \textbf{(1 - RMSE)*100} & 83.5\% & 92.0\% \\
             \end{tabular} &
             \begin{tabular}{|c|c|c|c|c|c|}
                 \textbf{Sensore} & 1 & 2 & 3 \\
                 \hline
                 \textbf{Varianza} & 9.2 & 4.2 & 1 \\
+                \hline
+                \textbf{(1 - RMSE)*100} & 96.4\% & 97.2\% & 99.0\% \\
             \end{tabular} \\
             \hline
-        \end{tabular}
+        \end{tabular}}
     \end{center}
     \caption{Valori della varianza delle distribuzioni associate ai sensori dei due modelli considerati.}
     \label{tab:6}
@@ -496,11 +501,47 @@ Si pu\`o notare che il classificatore \`e robusto e mostra che non \`e important
 % \section{Valutazione computazionale} % probabilmente da rimuovere
 % describe here experiments aimed at evaluating computational performance (e.g., CPU usage, RMA usage, etc)
 
-
 \section{Valutazione tecnica}
 % describe here experiments aimed at evaluating your tools wrt their intended use.
 % For example, software to detect adversarial attacks will be evaluated here showing how good (or bad) it is in detecting attcks.
-% Parlare della grandezza dei chunks trovati
+
+In questo capitolo verr\`a presa in considerazione una classe di attacchi ai sensori e la risposta dell'algoritmo di rilevamento.
+
+L'attacco ai sensori viene pensato come un introduzione di rumore gaussiano nelle misurazioni dei sensori. Dato che nell'attuale implementazione viene gi\`a introdotto del rumore gaussiano, come discusso nel Capitolo \ref{chap:4}, un attacco pu\`o essere visto come una variazione (in eccesso) della varianza
+
+\begin{table}
+    \begin{center}
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \textbf{\% varianza / \% chunk} & \textbf{25\%} & \textbf{50\%} & \textbf{75\%} & \textbf{100\%} \\
+            \hline
+            \begin{tabular}{|c|}
+                Sensore \\
+                \hline
+                \textbf{5\%} \\
+                \hline
+                \textbf{10\%} \\
+                \hline
+                \textbf{15\%} \\
+                \hline
+                \textbf{20\%} \\
+            \end{tabular} &
+            \begin{tabular}{|c|c|}
+                I & II \\
+                \hline
+                53.2 & 55.8 \\
+                \hline
+                53.2 & 55.8 \\
+                \hline
+                53.2 & 55.8 \\
+                \hline
+                53.2 & 55.8 \\
+            \end{tabular}
+            \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
 
 \begin{sidewaysfigure}[b]
     \includegraphics[scale=0.38]{car.png}
