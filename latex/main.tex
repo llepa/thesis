@@ -13,6 +13,9 @@
 \usepackage{hyperref}
 \usepackage{rotating}
 
+\usepackage{array}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
 \usepackage{hypcap}
 \usepackage{titlesec}
 \titleformat{\chapter}[hang]{\Huge\bf}{\thechapter{. }}{0pt}{\Huge\bf}
@@ -463,7 +466,7 @@ Nel caso del secondo modello, il modello SVM viene allenato e validato con una d
 I risultati sperimentali sono mostrati nella Tabella \ref{tab:3} e si pu\`o notare che il classificatore raggiunge un'accuratezza per chunk con una dimensione di 80.
 Dato che il sample time del modello \`e di 1 secondo, significa che per poter estrarre le feature dai chunk bisogna attendere 80 secondi.
 
-\begin{table}
+\begin{table}[t]
     \begin{center}
     \resizebox{\textwidth}{!}{
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
@@ -496,7 +499,7 @@ si cerca di raggiungere tutti gli stati del sistema affinché la probabilit\`a c
 
 Le simulazioni hanno una durata di 24 ore e 12 ore, rispettivamente per il primo e il secondo modello.
 I risultati della cross validation, per differenti valori di k, vengono mostrati nella Tabella \ref{tab:4} per il primo modello e nella Tabella \ref{tab:5} per il secondo.
-Si pu\`o notare che il classificatore \`e robusto e mostra che non \`e importante quale range delle serie temporali vengono utilizzate per il trainign e il testing .
+Si pu\`o notare che il classificatore \`e robusto e mostra che non \`e importante quale range delle serie temporali vengono utilizzate per il trainign e il testing  .
 
 % \section{Valutazione computazionale} % probabilmente da rimuovere
 % describe here experiments aimed at evaluating computational performance (e.g., CPU usage, RMA usage, etc)
@@ -507,41 +510,106 @@ Si pu\`o notare che il classificatore \`e robusto e mostra che non \`e important
 
 In questo capitolo verr\`a presa in considerazione una classe di attacchi ai sensori e la risposta dell'algoritmo di rilevamento.
 
-L'attacco ai sensori viene pensato come un introduzione di rumore gaussiano nelle misurazioni dei sensori. Dato che nell'attuale implementazione viene gi\`a introdotto del rumore gaussiano, come discusso nel Capitolo \ref{chap:4}, un attacco pu\`o essere visto come una variazione (in eccesso) della varianza
+L'attacco viene pensato come un'introduzione di rumore gaussiano nelle misurazioni dei sensori. Dato che nell'attuale implementazione viene gi\`a introdotto del rumore gaussiano, come discusso nel Capitolo \ref{chap:4}. Un attacco quindi pu\`o essere visto come una variazione della varianza del rumore gi\`a presente. 
+Nel seguito verr\`a visto solo il caso con incremento della varianza.
 
-\begin{table}
-    \begin{center}
+Per ogni sensore, viene aggiunto del rumore con una varianza che varia tra il 5\% e il 20\% attaccando diverse misurazioni di determinati chunk. I chunk sono scelti casualmente.
+Come sì pu\`o vedere dalle Tabelle \ref{tab:7} e \ref{tab:8}, attaccando $\frac{1}{4}$ di chunk con una varianza incrementata del 5\%, circa solamente un attacco su due viene riconosciuto, performance che cresce aumentando la porzione attaccata.
+Attaccando la totalit\`a del chunk il rilevamento aumenta sensibilmente.
+
+
+\begin{table}[t]
+        \resizebox{\textwidth}{!}{
         \begin{tabular}{|c|c|c|c|c|}
             \hline
-            \textbf{\% varianza / \% chunk} & \textbf{25\%} & \textbf{50\%} & \textbf{75\%} & \textbf{100\%} \\
+            \textbf{\% Varianza / \% Chunk} & \textbf{25\%} & \textbf{50\%} & \textbf{75\%} & \textbf{100\%} \\
             \hline
-            \begin{tabular}{|c|}
-                Sensore \\
-                \hline
-                \textbf{5\%} \\
-                \hline
-                \textbf{10\%} \\
-                \hline
-                \textbf{15\%} \\
-                \hline
-                \textbf{20\%} \\
+            \begin{tabular}{|P{0.3\linewidth}|}
+                \tabularnewline \hline 
+                \textbf{5\%} \\ \hline
+                \textbf{10\%} \\ \hline
+                \textbf{15\%} \\ \hline
+                \textbf{20\%} \\ 
             \end{tabular} &
             \begin{tabular}{|c|c|}
-                I & II \\
-                \hline
-                53.2 & 55.8 \\
-                \hline
-                53.2 & 55.8 \\
-                \hline
-                53.2 & 55.8 \\
-                \hline
-                53.2 & 55.8 \\
-            \end{tabular}
+                I & II \\ \hline
+                53.2 & 55.8 \\ \hline
+                66.5 & 64.1 \\ \hline
+                71.1 & 73.8 \\ \hline
+                77.4 & 76.3 \\
+            \end{tabular} &
+            \begin{tabular}{|c|c|}
+                I & II \\ \hline
+                73.0 & 72.8 \\ \hline
+                79.2 & 80.8 \\ \hline
+                83.2 & 84.2 \\ \hline
+                88.2 & 90.0 \\
+            \end{tabular} &
+            \begin{tabular}{|c|c|}
+                I & II \\ \hline
+                89.2 & 90.1 \\ \hline
+                91.5 & 91.7 \\ \hline
+                93.7 & 94.0 \\ \hline
+                94.6 & 95.1 \\
+            \end{tabular} &
+            \begin{tabular}{|c|c|}
+                I & II \\ \hline
+                93.1 & 92.9 \\ \hline
+                94.8 & 95.4 \\ \hline
+                96.3 & 97.7 \\ \hline
+                98.6 & 99.2 \\
+            \end{tabular} \\
             \hline
-        \end{tabular}
-    \end{center}
+        \end{tabular}}
+    \caption{Attacchi sul primo modello.}
+    \label{tab:7}
 \end{table}
-
+\begin{table}[b]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \textbf{\% Varianza / \% Chunk} & \textbf{25\%} & \textbf{50\%} & \textbf{75\%} & \textbf{100\%} \\
+            \hline
+            \begin{tabular}{|P{0.3\linewidth}|}
+                \tabularnewline \hline 
+                \textbf{5\%} \\ \hline
+                \textbf{10\%} \\ \hline
+                \textbf{15\%} \\ \hline
+                \textbf{20\%} \\ 
+            \end{tabular} &
+            \begin{tabular}{|c|c|c|}
+                I & II & III \\ \hline
+                50.1 & 45.8 & 49.5 \\ \hline
+                54.7 & 49.9 & 54.1 \\ \hline
+                60.2 & 57.1 & 60.9 \\ \hline
+                65.1 & 61.4 & 66.0 \\
+            \end{tabular} &
+            \begin{tabular}{|c|c|c|}
+                I & II & III \\ \hline
+                60.4 & 58.3 & 60.6 \\ \hline
+                65.3 & 63.2 & 66.1 \\ \hline
+                69.9 & 64.5 & 68.4 \\ \hline
+                73.1 & 69.9 & 73.3 \\
+            \end{tabular} &
+            \begin{tabular}{|c|c|c|}
+                I & II & III \\ \hline
+                75.2 & 73.8 & 74.9 \\ \hline
+                78.1 & 75.2 & 77.6 \\ \hline
+                88.3 & 85.3 & 87.4 \\ \hline
+                94.7 & 90.1 & 93.9 \\
+            \end{tabular} &
+            \begin{tabular}{|c|c|c|}
+                I & II & III \\ \hline
+                85.1 & 93.9 & 84.6 \\ \hline
+                89.4 & 86.3 & 90.1 \\ \hline
+                94.3 & 92.1 & 94.5 \\ \hline
+                97.3 & 94.6 & 98.1 \\
+            \end{tabular} \\
+            \hline
+        \end{tabular}}
+    \caption{Attacchi sul secondo modello.}
+    \label{tab:8}
+\end{table}
 
 \begin{sidewaysfigure}[b]
     \includegraphics[scale=0.38]{car.png}
@@ -559,6 +627,8 @@ L'attacco ai sensori viene pensato come un introduzione di rumore gaussiano nell
 
 \chapter{Conclusioni}
 % Sum up what you did and outline some possible future developments.
+% Lavori successivi: attacchi combinati su più sensori
+
 
 \backmatter
 % Inserire qui referenze e citazioni
