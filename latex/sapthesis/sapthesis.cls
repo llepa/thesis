@@ -1,3 +1,10 @@
+% Questa è una copia locale di Sapthesis, non uso quindi la versione ufficiale.
+%
+% Ho solo cambiato il comando \SAP@Lauthesistype in "Relazione di Tirocinio", perché nel mio caso era una relazione e non una tesi di laurea.
+% Inoltre ho cambiato il percorso del logo della Sapienza sapienza-MLred-pos.pdf in modo che sia nella cartella assets.
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% sapthesis.cls                                                   %%
 %% version 4.1                                                     %%
@@ -392,7 +399,7 @@
     \ifSAP@bn
       \includegraphics[width=5cm]{sapienza-MLblack-pos}
     \else
-      \includegraphics[width=5cm]{sapienza-MLred-pos}
+      \includegraphics[width=5cm]{assets/sapienza-MLred-pos}
     \fi
 
     \nointerlineskip
@@ -492,7 +499,7 @@
     \ifSAP@bn
       \includegraphics[width=5cm]{sapienza-MLblack-pos}
     \else
-      \includegraphics[width=5cm]{sapienza-MLred-pos}
+      \includegraphics[width=5cm]{assets/sapienza-MLred-pos}
     \fi
 
     \nointerlineskip
@@ -599,7 +606,7 @@
     \ifSAP@bn
       \includegraphics[width=5cm]{sapienza-MLblack-pos}
     \else
-      \includegraphics[width=5cm]{sapienza-MLred-pos}
+      \includegraphics[width=5cm]{assets/sapienza-MLred-pos}
     \fi
 
     \nointerlineskip
@@ -697,7 +704,7 @@
     \ifSAP@bn
       \includegraphics[width=5cm]{sapienza-MLblack-pos}
     \else
-      \includegraphics[width=5cm]{sapienza-MLred-pos}
+      \includegraphics[width=5cm]{assets/sapienza-MLred-pos}
     \fi
 
     \nointerlineskip
@@ -792,7 +799,7 @@
     \ifSAP@bn
       \includegraphics[width=5cm]{sapienza-MLblack-pos}
     \else
-      \includegraphics[width=5cm]{sapienza-MLred-pos}
+      \includegraphics[width=5cm]{assets/sapienza-MLred-pos}
     \fi
 
     \nointerlineskip
@@ -1064,7 +1071,7 @@
   \newcommand{\SAP@CandidateLabel}{Candidato}
   \newcommand{\SAP@CandidateLabelFemale}{Candidata}
   \newcommand{\SAP@IDnumberLabel}{Matricola}
-  \newcommand{\SAP@ThesisAdvisorLabel}{Responsabile} % modifica: Relatore
+  \newcommand{\SAP@ThesisAdvisorLabel}{Responsabile}
   \newcommand{\SAP@ThesisAdvisorsLabel}{Relatori}
   \newcommand{\SAP@ThesisCoAdvisorLabel}{Correlatore}
   \newcommand{\SAP@ThesisCoAdvisorsLabel}{Correlatori}

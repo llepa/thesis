@@ -3,7 +3,7 @@
 % !TeX spellcheck = it_IT
 
 % \documentclass[a4paper, 11pt]{article}
-\documentclass[Lau,binding=0.6cm]{sapthesis}
+\documentclass[Lau,binding=0.6cm,noexaminfo]{sapthesis}
 
 \usepackage{microtype}
 \usepackage[italian]{babel}
@@ -45,7 +45,7 @@
 
 \maketitle
 
-\dedication{Decidere se inserire. Ne vale la pena?}
+\dedication{Ringrazio tutti i familiari e gli amici che mi sono stati vicini, che mi hanno incoraggiato quando pensavo di non farcela e che mi hanno sopportato quando non sapevo fare altro che parlare di universit\`a. Grazie.}
 
 % ----------------------------------------------------------------------------------------
 
@@ -53,6 +53,18 @@
 
 \chapter{Sommario} 
 % Massimo una pagina da scrivere alla fine
+\`E proposta una procedura per autenticare i sensori e rilevare attacchi che cercano di minare l'integrit\`a dei dati in Sistemi Cyber-Fisici (CPS).
+Questa tecnica si basa su \cite{ahmed2018noise}: si seguono i passi fondamentali e si adatta la metodologia in base ai casi di studio e alla tecnologia utilizzati.
+Lo schema proposto utilizza le caratteristiche hardware dei sensori e la fisica dei processi per creare dei modelli univoci per ogni sensore (da qui il termine \textit{fingerprint}).
+Il fingerprint di un sensore \`e quindi una funzione del rumore di un sensore, intrinseco nelle misurazioni che i sensori compiono. 
+
+Si cerca quindi di simulare il comportamento di un sensore con difetti di fabbricazione, che contenga nelle sue misurazioni un errore.
+Il fingerprint di un sensore \`e generato in base alle misurazioni ottenuto durante il normale funzionamento del sistema.
+Si mostra che durante l'alterazione delle misurazioni di un sensore (ovvero durante l'injection di dati), il pattern del rumore di un sensore devia da quello che ha generato il fingerprint, permettendo quindi di rilevare attacchi.
+
+Gli esperimenti sono eseguiti su due modelli differenti di autoveicoli. Un modello che simula le dinamiche di un'automobile a cambio automatico e un modello di un'automobile con controllo climatico automatico.
+Una classe di attacchi \`e ideata per mettere in difficolt\`a lo schema proposto e un'analisi dei risultati \`e dunque effettuata.
+Si vedr\`a il tempo minimo (relativamente al sistema considerato) necessario per identificare con maggiore precisione determinati attacchi.
 
 % ----------------------------------------------------------------------------------------   
 
@@ -65,26 +77,39 @@
 % Short description of context,  for example:
 % Tutti gli essere vivneti per sopravviver hanno bisogno di alimentarsi.
 % Gli uomini sono essere viventi, e quindi hanno bisogno di alimentarsi.
+Un Sistema Cyber-Fisico \`e composto da vari componenti che sono in continua comunicazione tra di loro, come attuatori, sensori, controllori e reti di comunicazione. 
+Un esempio di questi sistemi sono reti di distribuzione dell'energia elettrica, impianti di trattamento dell'acqua, veicoli autonomi, dispositivi medici impiantabili.
+% Recenti sforzi nella sicurezza sono rivolti verso le tipiche componenti presenti in un'infrastruttura IT, da misure implementate a livello di rete, di traporto e soprattuto applicativo.
+I dati dei sensori sono trasmessi verso un controllore logico programmabile (PLC) installato nell'hardware del sistema che ha il compito di prendere decisioni appropriate sulla base delle misurazioni dei sensori.
 
 \section{Motivazioni}
 % Motivation for what we want to do. esempio:
 % Purtroppo la mancanza di una alimentazione adeguata è uno dei problemi più importanti nei paesi sottosviluppati
+La comunicazione con l'esterno, oltre agli innumerevoli vantaggi di monitorazione e controllo che porta, sottopone a vari rischi la sicurezza del sistema \cite{cardenas2009challenges}. 
+Un abile avversario capace di intercettare e rimpiazzare (spoofing) dati nel dominio digitale o fisico pu\`o portare il sistema in stati non sicuri, con risultati anche catastrofici.
+Vi \`e quindi un livello, quello fisico, che pu\`o essere utilizzato per garantire una maggiore sicurezza.
+
+Dunque, l'obiettivo non \`e quello di conservare la confidenziali\`a dei dati come nei tipici metodi della sicurezza informatica ma \`e quello di garantira l'integrit\`a e l'affidabilit\`a dei dati \cite{gollmann2016cyber}. 
 
 \section{Contributi}
 % Describe here your contributions, namely the missing items identified in the motivations. esempio:
 % Questo lavoro propone un metodo per generare cibo per tutti gli abitanti dei paesi sottosviluppati ...
+Questo lavoro implementa lo schema descritto in \cite{ahmed2018noise}, adattandolo e modificandolo a diversi sistemi di interesse in base a differenti scelte software, cercando di produrre risultati sperimentali concreti nei confronti di una determinata classe di attacchi. 
 
-\section{Stato dell'arte}
+% \section{Stato dell'arte}
 % Describe here the state of the art (e.g., algorithms and tools  available).
 % For each paper/tool explain what you do that is not already available (killing).
 
 \section{Struttura}
 % Give an outline of the thesis structure (one sentence per section)
-
+Nel Capitolo \ref{chap:2} vengono definite le basi teoriche utili a comprendere determinati concetti e scelte presenti nelle successive sezioni del lavoro.
+Le principali scelte metodologiche vengono descritte nel Capitolo \ref{chap:3} e il modo in cui queste sono adattate nel presente lavoro vengono definite nel Capitolo \ref{chap:4}.
+Nel Capitolo \ref{chap:5} sono descritti le scelte tecnologiche, i sistemi di interesse, gli attacchi e i risultati sperimentali con relativa analisi.
+Vengono infine tratte le conclusioni e valutati possibli lavori futuri come continuazione del presente nel Capitolo \ref{chap:6}.
 
 % ----------------------------------------------------------------------------------------
 
-\chapter{Background}\label{chap:1}
+\chapter{Background}\label{chap:2}
 % Put in this section all the background knowledge needed to understand what you did.
 % Parlare di dati di sensori, serie temporali estratti dai sensori, rmse, rumore intrinseco sensori --> residual
 % machine learning model e decision 
@@ -172,32 +197,10 @@ e \textit{supervised}, cio\'e in cui il datasert \`e del tipo
 \end{equation}
 Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un elemento di $Y$, cio\`e la classe $C_i$ di appartenenza.
 
-Ogni elemento $x_i \in X$ \`e composto da uno o pi\`u valori ed ognuno di questi valori definisce una propriet\`a o \textit{feature}, utilizzando il terminre pi\`u preciso, di $x_i$. 
+Ogni elemento $x_i \in X$ \`e composto da uno o pi\`u valori ed ognuno di questi valori definisce una propriet\`a, o \textit{feature} utilizzando il terminre pi\`u preciso, di $x_i$. 
 Queste feature sono definite, localmente a questo lavoro, come alcuni valori statistici (di cui si \`e parlato precedentemente), mostrati nella Tabella \ref{tab:1}, estratti dai vettori dei residui.\footnote{Il vettore dei residui \`e quindi parte fondamentale per la definizione dei fingerprint dei sensori.}
 
-\begin{table}[tb]
-    \begin{center}
-        \begin{tabular}{|l|l|}
-        \hline
-        \textbf{Feature} & \textbf{Descrizione} \\
-        \hline
-        Media & $\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$ \\
-        \hline
-        Varianza & $\sigma = \frac{1}{N}\sum_{i=1}^N (x_i - \bar{x})^2 $ \\
-        \hline
-        Dev. Med. Ass. & $D_{\bar{x}} = \frac{1}{N}\sum_{i=1}^N |x_i - \bar{x}|$ \\
-        \hline
-        Asimmetria & $\gamma = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^3 $ \\
-        \hline
-        Curtosi & $ \beta = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^4 - 3$\\
-        \hline
-        \end{tabular}
-    \end{center}
-    \caption{Lista delle feature utilizzate; $x$ \`e la serie temporale di dimensione $N$ proveniente dal sensore.}
-    \label{tab:1}
-\end{table}
-
-Sia $\hat{f}$ la funzione che approssima $f$. L'errore di $\hat{f}$ rispetto ad $S \subset X$ \`e uguale alla proporzione con cui $\hat{f}$ classifica erroneamente, ovvero
+Sia $\hat{f}$ la funzione che approssima $f$. L'errore di $\hat{f}$ rispetto ad $S \subset X$ \`e uguale alla proporzione con cui $\hat{f}$ classifica erroneamente i sample in $S$, ovvero
 \begin{equation}
     error_{S}(\hat{f}) = \frac{1}{n} \sum_{x\in S} \phi(\hat{f}(x), f(x)),
 \end{equation}
@@ -230,26 +233,48 @@ Per le nuove misurazioni, prendendo ancora in esempio il valore medio e volendo 
 caratteristica preferibile in quanto non si vogliono campionare troppi valori in situazioni real-time (equivarrebbe ad aspettare di pi\`u per prendere una decisione, e quindi essere potenzialmente per più tempo sotto attacco).
 Scegliere un'intervallo di condifenza delle nuove misurazioni troppo grande potrebbe portare ad una sovrapposizione tra il nuovo intervallo ed quello di reference.\footnote{Il caso ideale sarebbe o di inclusione del primo nel secondo o di disgiunzione, rilevando nel primo caso un valore ammesso e nel secondo caso un attacco.}
 Per avere una sensibilit\`a migliore contro gli attacchi il problema viene affrontato avvalendosi dell'aiuto di un determintao modello di Machine Learning, 
-che ha un buon comprtamento verso valori che non sono perfettamente discriminabili.
+che ha un buon comportamento verso valori che non sono perfettamente discriminabili.
 
 Il prossimo passo \`e quello di definire correttamente il problema di M.L. ed utilizzare un algoritmo di learning adeguato.
 A questo scopo bisogna preparare i dati estratti dai sensori (e di conseguenza il vettore dei residui) per poter essere utilizzati efficacemente dall'algoritmo di learning.
+
+\begin{table}[t]
+    \begin{center}
+        \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Feature} & \textbf{Descrizione} \\
+        \hline
+        Media & $\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$ \\
+        \hline
+        Varianza & $\sigma = \frac{1}{N}\sum_{i=1}^N (x_i - \bar{x})^2 $ \\
+        \hline
+        Dev. Med. Ass. & $D_{\bar{x}} = \frac{1}{N}\sum_{i=1}^N |x_i - \bar{x}|$ \\
+        \hline
+        Asimmetria & $\gamma = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^3 $ \\
+        \hline
+        Curtosi & $ \beta = \frac{1}{N} \sum_{i=1}^N (\frac{x_i - \bar{x}}{\sigma})^4 - 3$\\
+        \hline
+        \end{tabular}
+    \end{center}
+    \caption{Lista delle feature utilizzate; $x$ \`e la serie temporale di dimensione $N$ proveniente dal sensore.}
+    \label{tab:1}
+\end{table}
 
 Il dataset contiene coppie in cui il primo elemento $x_i$ \`e un vettore che contiene le feature elencate nella Tabella \ref{tab:1}, e il secondo elemento $y_i$ \`e la classe di apparteneza che rappresenta il sensore che ha prodotto le misurazioni utilizzate per costruire $x_i$.
 
 Data la natura statistica delle feature utilizzate, sarebbe inadeguato estrarre le stesse basandosi solamente sulla misurazione avvenuto all'istante di tempo $k$.\footnote{Estrarre delle feature come media e varianza da un'unica misurazione non ha senso in quanto la media equivarrebbe al valore stesso e la varianza sarebbe necessariamente nulla.}
 Detto ci\`o, bisogna partizionare ogni serie temporale in blocchetti (\textit{chunk}) di dimensione $d$. 
 Da ogni chunk verranno poi estratte le feature precedentemente menzionate ed etichettate con la classe (quindi sensore) di appartenenza.
-Scegliere la giusta dimensione $d$ dei vari chunk \`e una scelta sensibile in quanto forzer\`a anche la dimensione dei chunk composti da residui di sensori che verranno calcolati durante il normale funzionamento del sistema.
+Scegliere la giusta dimensione $d$ dei vari chunk \`e una scelta sensibile in quanto forzer\`a anche la dimensione dei chunk composti da residui di sensori che verranno calcolati mentre il sistema \`e in uno stato in cui potrebbe essere soggetto ad attacchi.
 L'idea \`e di avere chunk di serie temporali abbastanza grandi da catturare la dinamica del processo e piccoli abbastanza da ridurre il tempo di attesa per discriminare nuove misurazioni.
 
 Tutte le istanze di $X$ che appartengono allo stesso sensore determinano il fingerprint del sensore e il primo compito della funzione $f$ (Funzione \ref{eq:3}) \`e quello di distinguere correttamente i sensori, 
 quindi generare un fingerprint il pi\`u preciso e privo di ambiguit\`a possibile. Nel Capitolo \ref{chap:5}, l'esistenza del fingerprint verr\`a provata empiricamente.
 
-L'algoritmo di M.L. utilizzato \`e il \textit{Support Vector Machine} (SVM)\cite{noble2006support}, impiegato come un classificatore a 2 classi (One vs. One) che etichetta i dati provenienti dal legittimo sensore (\textit{ground truth}) come un \textit{1}
+L'algoritmo di M.L. utilizzato \`e il \textit{Support Vector Machine} (SVM) \cite{noble2006support}, impiegato come un classificatore a 2 classi (One vs. One) che etichetta i dati provenienti dal legittimo sensore (\textit{ground truth}) come un \textit{1}
 e come \textit{0} i dati provenienti dagli altri sensori. In questo modo gli attacchi possono essere considerati come un tipo dato appartenente ad altre classi.
 
-L'algoritmo SVM verr\`a allenato su un campione di dati che dipender\`a dal sistema considerato e verr\`a validato usando la tecnica del \textit{k-fold cross validation}\cite{refaeilzadeh2009cross}.
+L'algoritmo SVM verr\`a allenato su un campione di dati che dipender\`a dal sistema considerato e verr\`a validato usando la tecnica della \textit{k-fold cross validation} \cite{refaeilzadeh2009cross}.
 Successivamente, siccome nel dataset non sono presenti dati relativi ad attacchi, il classificatore a 2 classi potrebbe mancare alcuni degli attacchi.
 
 Per affrontare questo problema viene utilizzato la modalit\`a di SVM ad una classe (\textit{one-class} SVM) per fare il learning del modello di M.L., basandosi su una classe di dati normali (appartenenti quindi ad un solo sensore). 
@@ -265,7 +290,7 @@ Per ovviare a questo problema, viene adoperato un classificatore ad una classe c
 % describe here how you implemented the functionalities described in the methods section.
 % Use pseudo-code or diagrams.
 % Parlare del come si è implementato il rumore intrinseco in un modello symulink
-Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione dei vettori dei residui, nel presente lavoro viene presa una strada alternativa e pi\`u semplice di quella presentata in \cite{ahmed2018noise}.
+Alla luce di quanto detto nel Capitolo \ref{chap:2} per quanto riguarda l'estrazione dei vettori dei residui, nel presente lavoro viene presa una strada alternativa e pi\`u semplice di quella presentata in \cite{ahmed2018noise}.
 
 Viene utilizzato un modello di sistema dinamico ideale, che non produce a livello delle misurazioni dei sensori alcun tipo di rumore. Successivamente, il rumore viene inserito ``artificialmente'', sotto forma di rumore gaussiano.
 
@@ -287,6 +312,7 @@ Sostituendo dall'Equazione \ref{eq:6}, si nota che l'RMSE per ogni sensore $j$ d
 
 Calcolati i vettori dei residui e preparati (divisi in chunk ed estratte le feature) per essere processati dall'algoritmo SVM, e fatto il learning del modello di M.L., 
 quest'ultimo viene validato tramite la k-fold cross validation con $k=2,\ldots,15$.\footnote{Questa operazione, con un $k$ variabile, ha una duplice funzionalit\`a: quella di validare il modello di M.L. trovato e quella di capire quanto il modello \`e sensibile allla quantit\`a di dati utilizzati nella fase di learning.}
+
 Questo significa, per valori di $k$ crescenti, il dataset $D$ (per come \`e stato definito nel Capitolo \ref{chap:3}) viene suddiviso in $k$ partizioni e di queste, $k-1$ vengono utilizzate per fare il training e una per il testing.
 In questo modo si cerca di evitare problemi di sovradattamento, tipico della suddivisione del dataset in due partizioni.
 Per ogni $k$, l'accuratezza finale del modello \`e data dalla media delle accuratezze calcolate durante le $k$ fasti di test.
@@ -312,11 +338,13 @@ Gli obiettivi principali di questa fase sono molteplici.
     \item Definire la tipologia di attacchi che possono essere identificati e quindi valutare la precisione con cui vengono riconosciuti.
  \end{itemize}
 
+Come si vedr\`a, ognuno di questi punti \`e strettamente legato agli altri e mostrare la correttezza di uno implica poter proseguire con il successivo.
+
 \section{Configurazione}
 % describe experimental setting: hardware used, software used, data used, etc. ....
 Il software che implementa le funzionalit\`a qui presentate \`e stato scritto utilizzando diversi linguaggi di programmazione, tra cui principalmente Python e MATLAB.
 Il software utilizzato per ottenere dati provenienti da simulazioni di sistemi cyber-fisici \`e Simulink, un software per la simulazione e la modellazione di sistemi dinamici.
-La libreria sfruttata per quanto riguarda gli algoritmi Support Vector Machine \`e skikit-learn \cite{pedregosa2011scikit}, basata su LibSVM \cite{chang2011libsvm}.
+La libreria sfruttata per quanto riguarda gli algoritmi Support Vector Machine \`e scikit-learn \cite{pedregosa2011scikit}, basata su LibSVM \cite{chang2011libsvm}.
 
 \newpage
 \section{Casi di studio}
@@ -458,10 +486,11 @@ Alla luce di quanto detto nella Sezione \ref{sec:1}, per quanto riguarda l'intro
 sono state trovate empiricamente le varianze delle distrubizioni tale che valga l'Equazione \ref{eq:7}.
 Nella Tabella \ref{tab:6} possiamo vedere i valori per entrambi i modelli.
 
-Nella Figura \ref{fig:3} vedere invece la rappresentazione grafica delle feature statistiche dei vettori dei residui dei due sensori che appartengono al modello in Figura \ref{fig:1}.
-\`E facile in questo modo intuire significato del fingerprint, questo ci d\`a un'idea di come il profilo del rumore sia una peculiarit\`a di ogni sensore. Nell'esempio proposto vengono utilizzate tre feature, nello specifico media, varianza e deviazione media assoluta.
+Nella Figura \ref{fig:3} si pu\`o vedere invece la rappresentazione grafica delle feature statistiche dei vettori dei residui dei due sensori che appartengono al modello in Figura \ref{fig:1}.
+\`E facile in questo modo intuire il significato del fingerprint, questo ci d\`a un'idea di come il profilo del rumore sia una peculiarit\`a di ogni sensore. Nell'esempio proposto vengono utilizzate tre feature, nello specifico media, varianza e deviazione media assoluta.
 
 Come gi\`a detto in precedenza, per catturare le giuste dinamiche del sistema, vi \`e la necessit\`a di suddividere il dataset in blocchi, e questi non devono avere una dimensione tale da non allungare eccessivamente l'intervallo di tempo che deve passare affinch\'e un attacco venga identificato.
+
 Nel caso del primo modello, il modello SVM viene allenato e validato con dataset composti da feature estratte da chunk che hanno una dimensione variabile e crescente tra un'esecuzione e la successiva. La dimensione dei chunk va da un minimo di 5 fino ad un massimo di 55 misurazioni, con un incremento di 5.
 Come si pu\`o vedere dalla Tabella \ref{tab:2} l'accuratezza del classificatore converge verso valori molto vicini ad 1 per chunk di dimensioni maggiore di 25.
 Un valore ragionevole potrebbe essere uno tra 25 e 30 in quanto hanno un buonissimo livello di accuratezza ma mantengono una dimensione abbastanza ridotta.
@@ -505,7 +534,7 @@ si cerca di raggiungere tutti gli stati del sistema affinché la probabilit\`a c
 
 Le simulazioni hanno una durata di 24 ore e 12 ore, rispettivamente per il primo e il secondo modello.
 I risultati della cross validation, per differenti valori di k, vengono mostrati nella Tabella \ref{tab:4} per il primo modello e nella Tabella \ref{tab:5} per il secondo.
-Si pu\`o notare che il classificatore \`e robusto e mostra che non \`e importante quale range delle serie temporali vengono utilizzate per il trainign e il testing  .
+Si pu\`o notare che il classificatore \`e robusto e mostra che non \`e importante quale range delle serie temporali vengono utilizzate per il training e il testing.
 
 % \section{Valutazione computazionale} % probabilmente da rimuovere
 % describe here experiments aimed at evaluating computational performance (e.g., CPU usage, RMA usage, etc)
@@ -516,15 +545,15 @@ Si pu\`o notare che il classificatore \`e robusto e mostra che non \`e important
 
 In questo capitolo verr\`a presa in considerazione una classe di attacchi ai sensori e la risposta dell'algoritmo di rilevamento.
 
-L'attacco viene pensato come un'introduzione di rumore gaussiano nelle misurazioni dei sensori. Dato che nell'attuale implementazione viene gi\`a introdotto del rumore gaussiano, come discusso nel Capitolo \ref{chap:4}. Un attacco quindi pu\`o essere visto come una variazione della varianza del rumore gi\`a presente. 
-Nel seguito verr\`a visto solo il caso con incremento della varianza.
+L'attacco viene pensato come un'introduzione di rumore gaussiano nelle misurazioni dei sensori. Dato che nell'attuale implementazione viene gi\`a introdotto del rumore gaussiano, come discusso nel Capitolo \ref{chap:4}. 
+Un attacco pu\`o essere visto come una variazione della varianza del rumore gi\`a presente. 
+Nel seguito verr\`a visto solo il caso con un incremento della varianza.
 
 Per ogni sensore, viene aggiunto del rumore con una varianza che varia tra il 5\% e il 20\% attaccando diverse misurazioni di determinati chunk. I chunk sono scelti casualmente.
 Come sì pu\`o vedere dalle Tabelle \ref{tab:7} e \ref{tab:8}, attaccando $\frac{1}{4}$ di chunk con una varianza incrementata del 5\%, circa solamente un attacco su due viene riconosciuto, performance che cresce aumentando la porzione attaccata.
 Attaccando la totalit\`a del chunk il rilevamento aumenta sensibilmente.
 
-
-\begin{table}[t]
+\begin{table}[b]
         \resizebox{\textwidth}{!}{
         \begin{tabular}{|c|c|c|c|c|}
             \hline
@@ -567,7 +596,7 @@ Attaccando la totalit\`a del chunk il rilevamento aumenta sensibilmente.
             \end{tabular} \\
             \hline
         \end{tabular}}
-    \caption{Attacchi sul primo modello.}
+    \caption{Percentuale con cui gli attacchi sui sensori del primo modello vengono riconosciuti. Vengono mostrati i dati per i due sensori, con varianza del rumore introdotto variabile e porzione del chunk attaccato crescente.}
     \label{tab:7}
 \end{table}
 \begin{table}[b]
@@ -613,7 +642,7 @@ Attaccando la totalit\`a del chunk il rilevamento aumenta sensibilmente.
             \end{tabular} \\
             \hline
         \end{tabular}}
-    \caption{Attacchi sul secondo modello.}
+        \caption{Percentuale con cui gli attacchi sui sensori del secondo modello vengono riconosciuti. Vengono mostrati i dati per i tre sensori, con varianza del rumore introdotto variabile e porzione del chunk attaccato crescente.}
     \label{tab:8}
 \end{table}
 
@@ -631,9 +660,15 @@ Attaccando la totalit\`a del chunk il rilevamento aumenta sensibilmente.
     \label{fig:2}
 \end{sidewaysfigure}
 
-\chapter{Conclusioni}
+\chapter{Conclusioni}\label{chap:6}
 % Sum up what you did and outline some possible future developments.
 % Lavori successivi: attacchi combinati su più sensori
+Si \`e visto che \`e possibile identificare univocamente un sensore in base alle sue propriet\`a fisiche e manifatturiere e che nuovi dati possono essere confrontati con il pattern costruito dai valori che i sensori misurano durante il normale funzionamento.
+
+Il metodo presentato si comporta bene nei confronti di attacchi messi in atto come introduzione di ruomore gaussiano, a partire da valori della varianza superiore a circa il 20\% rispetto a quella gi\`a presente nel rurmore introdotto dagli stessi sensori.
+La tipologia di attacchi presentata ha un riscontro nel mondo reale e potrebbero essere messi in atto in attacchi reali, ma attacchi pi\`u sofisticati, come gli attacchi stealthy, potrebbero mettere in difficolt\`a lo schema proposto.
+
+Futuri sviluppi potrebbero riguardare l'implementazione di nuove tipologie di attacchi e l'implementazione delle tecniche viste con casi di studio che descrivano le dinamiche dei sistemi in modo pi\`u realistico.
 
 \backmatter
 % bibliography

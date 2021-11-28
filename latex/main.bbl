@@ -7,11 +7,23 @@
 \newblock In \emph{Proceedings of the 34th Annual Computer Security
   Applications Conference}, pp. 566--581 (2018).
 
+\bibitem{cardenas2009challenges}
+\textsc{Cardenas, A., Amin, S., Sinopoli, B., Giani, A., Perrig, A., Sastry,
+  S., et~al.}
+\newblock Challenges for securing cyber physical systems.
+\newblock In \emph{Workshop on future directions in cyber-physical systems
+  security}, vol.~5. Citeseer (2009).
+
 \bibitem{chang2011libsvm}
 \textsc{Chang, C.-C. and Lin, C.-J.}
 \newblock Libsvm: a library for support vector machines.
 \newblock \emph{ACM transactions on intelligent systems and technology (TIST)},
   \textbf{2} (2011), 1.
+
+\bibitem{gollmann2016cyber}
+\textsc{Gollmann, D. and Krotofil, M.}
+\newblock Cyber-physical systems security.
+\newblock In \emph{The New Codebreakers}, pp. 195--204. Springer (2016).
 
 \bibitem{noble2006support}
 \textsc{Noble, W.~S.}
