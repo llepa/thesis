@@ -1,0 +1,32 @@
+\begin{thebibliography}{1}
+
+\bibitem{ahmed2018noise}
+\textsc{Ahmed, C.~M., Zhou, J., and Mathur, A.~P.}
+\newblock Noise matters: Using sensor and process noise fingerprint to detect
+  stealthy cyber attacks and authenticate sensors in cps.
+\newblock In \emph{Proceedings of the 34th Annual Computer Security
+  Applications Conference}, pp. 566--581 (2018).
+
+\bibitem{chang2011libsvm}
+\textsc{Chang, C.-C. and Lin, C.-J.}
+\newblock Libsvm: a library for support vector machines.
+\newblock \emph{ACM transactions on intelligent systems and technology (TIST)},
+  \textbf{2} (2011), 1.
+
+\bibitem{noble2006support}
+\textsc{Noble, W.~S.}
+\newblock What is a support vector machine?
+\newblock \emph{Nature biotechnology}, \textbf{24} (2006), 1565.
+
+\bibitem{pedregosa2011scikit}
+\textsc{Pedregosa, F., et~al.}
+\newblock Scikit-learn: Machine learning in python.
+\newblock \emph{the Journal of machine Learning research}, \textbf{12} (2011),
+  2825.
+
+\bibitem{refaeilzadeh2009cross}
+\textsc{Refaeilzadeh, P., Tang, L., and Liu, H.}
+\newblock Cross-validation.
+\newblock \emph{Encyclopedia of database systems}, \textbf{5} (2009), 532.
+
+\end{thebibliography}

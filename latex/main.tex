@@ -106,8 +106,8 @@ La sfida di estrarre il fingerprint dai sensori è data dal fatto che questi sta
 Prendendo in considerazione, per esempio, un termometro, se la temperatura dell'ambiente che misura rimane costante nel tempo è facile estrarre il fingerprint del rumore e costruirne il profilo, 
 ma in processi reali non è così semplice, gli stati cambiano continuamente, per esempio l'aumento di velocità di una macchina per via della pressione sul pedale dell'acceleratore.
 \`E importante catturare queste variazioni affinch\'e le misurazioni dinamiche dei sensori possano essere stimate.
-In [1] questo problema viene affrontato definendo un modello analitico del sistema interessato, rappresentato tramite il modello \textit{State-Space}. 
-Vengono implementate le tecniche definite in [2], definendo cos\`i il modello lineare tempo inviariante (LTI) del sistema, rappresentato dal sistema di equazioni
+In \cite{ahmed2018noise} questo problema viene affrontato definendo un modello analitico del sistema interessato, rappresentato tramite il modello \textit{State-Space}. 
+Viene cos\`i definito il modello lineare tempo inviariante (LTI) del sistema, rappresentato dal sistema di equazioni
 \begin{equation}\label{eq:4}
     \begin{cases}
         x_{k+1} = Ax_k + Bu_k + \vartheta_k, \\
@@ -120,14 +120,14 @@ $y_k \in \mathbb{R}_m$ e $\eta_k \in \mathbb{R}_m$ rappresentano, rispettivament
 $A$, $B$, $C$ sono le matrici dello spazio di stato di dimensioni adeguate che rappresentato la dinamica del sistema.
 
 Definito il precedente sistema, ci sono molti punti che un attaccante mal intenzionato potrebbe bersagliare.
-Nel lavoro presentato, cos\`i come in [1], vengono presi in considerazione \textit{spoofing attack} ai sensori che potrebbero essere portati a termine tramite uno schema \textit{Man-in-The-Middle}.
+Nel lavoro presentato, cos\`i come in \cite{ahmed2018noise}, vengono presi in considerazione \textit{spoofing attack} ai sensori che potrebbero essere portati a termine tramite uno schema \textit{Man-in-The-Middle}.
 L'equazione lineare che rappresenta questa tipologia di attacchi \`e data da
 \begin{equation}
 \bar{y}_{k} = y_{k} + \delta_{k} = Cx_k + \eta_k + \delta_k,\footnote{Notare l'ugualianza con l'equazione \ref{eq:1}: un attacco \`e considerato come un'introduzione di rumore nella misurazione fatta da un sensore.}
 \end{equation}
 in cui $\delta_k \in \mathbb{R}_m$ rappresenta un attacco ai sensori.
 
-In [1], dato l'output $\bar{y}_k$, viene adoperato il \textit{filtro di Kalman} per stimare lo stato del sistema e il vettore dei \textit{residui}, definito, in questo contesto, come la differenza tra la reale misurazine effettuata dal sensore
+In \cite{ahmed2018noise}, dato l'output $\bar{y}_k$, viene adoperato il \textit{filtro di Kalman} per stimare lo stato del sistema e il vettore dei \textit{residui}, definito, in questo contesto, come la differenza tra la reale misurazine effettuata dal sensore
 e la stima della misurazione calcolata dal filtro nell'istante $k$:
 \begin{equation}
     r_k := \bar{y}_k - \hat{y}_k,
@@ -139,7 +139,7 @@ Detto ci\`o, per quantificare la bont\`a del modello del sistema, viene utilizza
     RMSE = \sqrt{\frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{n}}\label{eq:5}.
 \end{equation}
 Questa metrica rappresenta la distanza tra il valore stimato e quello misurato, ovvero quanto il primo \`e lontano dal secondo.
-Nella letteratura della teoria del controllo, modelli con un'accuratezza\footnote{Se l'RMSE rappresenta un errore, l'accuratezza viene calcolata come 100 - RMSE.} superiore al 70\% sono considerati accettabili approssimazioni della dinamica di sistemi reali.
+Nella letteratura della teoria del controllo, modelli con un'accuratezza superiore al 70\% sono considerati accettabili approssimazioni della dinamica di sistemi reali.\footnote{Se l'RMSE rappresenta un errore, l'accuratezza viene calcolata come 100 - RMSE.}
 
 Per ogni momento statistico (media, deviazione standard, \ldots) di una serie storica (ma non solo) si pu\`o definire un \textit{intervallo di confidenza} 
 che esprime la probabilit\`a che il valore calcolato sugli $N$ campioni della serie approssimi il valore effettivo del momento statistico.
@@ -152,16 +152,28 @@ in cui $\mu$ e $\bar{x}$ sono, rispettivamente, la media effettiva e quella calc
 e incrementando $N$, anche $\epsilon$ cresce, allargando l'intervallo di confidenza.
 Tale intervallo pu\`o essere definito anche per momenti di ordine superiore.
 
-Nel contesto del presente lavoro, come si vedr\`a, volendo giudicare la legittimit\`a delle misurazioni di un determinato sensore, determinate propriet\`a statistiche delle nuove misurazioni (nuove nel contesto di normale 
-funzionamento del sistema \textit{aperto} ad attacchi) verranno confrontate con le stesse propriet\`a di misurazioni effettuate in condizioni \textit{sicure} (questi valori sono chiamati valori di \textit{reference}). 
-Per le nuove misurazioni, prendendo ancora in esempio il valore medio e volendo avere un intervallo di confidenza il pi\`u piccolo possibile (quindi un $\epsilon$ il pi\`u piccolo possibile), bisogna essere attenti per via di valori di $N$ non molto grandi,
-caratteristica preferibile in quanto non si vogliono campionare troppi valori in situazioni real-time (equivarrebbe ad aspettare di pi\`u per prendere una decisione, e quindi essere potenzialmente per più tempo sotto attacco).
-Scegliere un'intervallo di condifenza delle nuove misurazioni troppo grande potrebbe portare ad una sovrapposizione tra il nuovo intervallo ed quello di reference\footnote{Il caso ideale sarebbe o di inclusione del primo nel secondo o di disgiunzione, rilevando nel primo caso un valore ammesso e nel secondo caso un attacco.}.
-Per avere una sensibilit\`a migliore contro gli attacchi il problema viene affrontato avvalendosi dell'aiuto di un determintao modello di \textit{Machine Learning}, 
-che ha un buon comprtamento verso valori che non sono perfettamente discriminabili.
+Viene ora data una definizione basilare di cosa \`e un problema di \textit{Machine Learning}.
+Un problema di M.L. pu\`o essere definito come una funzione 
+\begin{equation}
+f: X \to Y,\label{eq:3}
+\end{equation}
+dato un insieme $D$ (dataset) contenente informazioni riguardanti $f$.
+Fare il \textit{learning} della funzione $f$ significa trovare un'altra funzione $\hat{f}$ che approssima e ritorna valori più vicini possibile ad $f$, specialmente per elementi non presenti in $D$.
+Nel presente lavoro il problema viene definito come un problema di \textit{classificazione}, ovvero in cui $f$ \`e definita tale che
+\begin{equation}
+    \begin{array}{l}
+    X := \mathbb{R}^m, \\
+    Y := \{ C_1, C_2, \ldots, C_k \};
+    \end{array}
+\end{equation} 
+e \textit{supervised}, cio\'e in cui il datasert \`e del tipo
+\begin{equation}
+    D = \{ (x_i, y_i)_{i=1}^N \}, x_i\in X, y_i\in Y
+\end{equation}
+Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un elemento di $Y$, cio\`e la classe $C_i$ di appartenenza.
 
-A tale scopo viene definito un problema di M.L. che ha come \textit{feature} alcuni valori statistici (di cui si \`e parlato precedentemente) estratti dai vettori residui\footnote{Il vettore dei residui \`e quindi parte fondamentale per la definizione dei fingerprint dei sensori.}.
-Queste feature sono mostrate nella Tabella \ref{tab:1}.
+Ogni elemento $x_i \in X$ \`e composto da uno o pi\`u valori ed ognuno di questi valori definisce una propriet\`a o \textit{feature}, utilizzando il terminre pi\`u preciso, di $x_i$. 
+Queste feature sono definite, localmente a questo lavoro, come alcuni valori statistici (di cui si \`e parlato precedentemente), mostrati nella Tabella \ref{tab:1}, estratti dai vettori dei residui.\footnote{Il vettore dei residui \`e quindi parte fondamentale per la definizione dei fingerprint dei sensori.}
 
 \begin{table}[tb]
     \begin{center}
@@ -184,25 +196,6 @@ Queste feature sono mostrate nella Tabella \ref{tab:1}.
     \caption{Lista delle feature utilizzate; $x$ \`e la serie temporale di dimensione $N$ proveniente dal sensore.}
     \label{tab:1}
 \end{table}
-
-Un problema di M.L. pu\`o essere definito come una funzione 
-\begin{equation}
-f: X \to Y,\label{eq:3}
-\end{equation}
-dato un insieme $D$ (dataset) contenente informazioni riguardanti $f$.
-Fare il \textit{learning} della funzione $f$ significa trovare un'altra funzione $\hat{f}$ che approssima e ritorna valori più vicini possibile ad $f$, specialmente per elementi non presenti in $D$.
-Nel presente lavoro il problema viene definito come un problema di \textit{classificazione}, ovvero in cui $f$ \`e definita tale che
-\begin{equation}
-    \begin{array}{l}
-    X := \mathbb{R}^m, \\
-    Y := \{ C_1, C_2, \ldots, C_k \};
-    \end{array}
-\end{equation} 
-e \textit{supervised}, cio\'e in cui il datasert \`e del tipo
-\begin{equation}
-    D = \{ (x_i, y_i)_{i=1}^N \}, x_i\in X, y_i\in Y
-\end{equation}
-Quindi $f$ associa ad ogni elemento di $X$, cio\`e un vettore di $m$ reali, un elemento di $Y$, cio\`e la classe $C_i$ di appartenenza.
 
 Sia $\hat{f}$ la funzione che approssima $f$. L'errore di $\hat{f}$ rispetto ad $S \subset X$ \`e uguale alla proporzione con cui $\hat{f}$ classifica erroneamente, ovvero
 \begin{equation}
@@ -230,12 +223,21 @@ In seguito, questa metrica verr\`a utilizzata spesso per determinare la bont\`a 
 
 % Describe here the algorithm design from a math perspective. No code here.
 % Descrivere la suddivisione in chunks e come viene definito il modello di M.L.
-Come anticipato nel precedente capitolo, il prossimo passo \`e quello di definire correttamente il problema di M.L. ed utilizzare un algoritmo di learning adeguato.
+
+Nel contesto del presente lavoro, come si vedr\`a, volendo giudicare la legittimit\`a delle misurazioni di un determinato sensore, determinate propriet\`a statistiche delle nuove misurazioni (nuove nel contesto di normale 
+funzionamento del sistema \textit{aperto} ad attacchi) verranno confrontate con le stesse propriet\`a di misurazioni effettuate in condizioni \textit{sicure} (questi valori sono chiamati valori di \textit{reference}). 
+Per le nuove misurazioni, prendendo ancora in esempio il valore medio e volendo avere un intervallo di confidenza il pi\`u piccolo possibile (quindi un $\epsilon$ il pi\`u piccolo possibile), bisogna essere attenti per via di valori di $N$ non molto grandi,
+caratteristica preferibile in quanto non si vogliono campionare troppi valori in situazioni real-time (equivarrebbe ad aspettare di pi\`u per prendere una decisione, e quindi essere potenzialmente per più tempo sotto attacco).
+Scegliere un'intervallo di condifenza delle nuove misurazioni troppo grande potrebbe portare ad una sovrapposizione tra il nuovo intervallo ed quello di reference.\footnote{Il caso ideale sarebbe o di inclusione del primo nel secondo o di disgiunzione, rilevando nel primo caso un valore ammesso e nel secondo caso un attacco.}
+Per avere una sensibilit\`a migliore contro gli attacchi il problema viene affrontato avvalendosi dell'aiuto di un determintao modello di Machine Learning, 
+che ha un buon comprtamento verso valori che non sono perfettamente discriminabili.
+
+Il prossimo passo \`e quello di definire correttamente il problema di M.L. ed utilizzare un algoritmo di learning adeguato.
 A questo scopo bisogna preparare i dati estratti dai sensori (e di conseguenza il vettore dei residui) per poter essere utilizzati efficacemente dall'algoritmo di learning.
 
 Il dataset contiene coppie in cui il primo elemento $x_i$ \`e un vettore che contiene le feature elencate nella Tabella \ref{tab:1}, e il secondo elemento $y_i$ \`e la classe di apparteneza che rappresenta il sensore che ha prodotto le misurazioni utilizzate per costruire $x_i$.
 
-Data la natura statistica delle feature utilizzate, sarebbe inadeguato estrarre le stesse basandosi solamente sulla misurazione avvenuto all'istante di tempo $k$\footnote{Estrarre delle feature come media e varianza da un'unica misurazione non ha senso in quanto la media equivarrebbe al valore stesso e la varianza sarebbe necessariamente nulla.}.
+Data la natura statistica delle feature utilizzate, sarebbe inadeguato estrarre le stesse basandosi solamente sulla misurazione avvenuto all'istante di tempo $k$.\footnote{Estrarre delle feature come media e varianza da un'unica misurazione non ha senso in quanto la media equivarrebbe al valore stesso e la varianza sarebbe necessariamente nulla.}
 Detto ci\`o, bisogna partizionare ogni serie temporale in blocchetti (\textit{chunk}) di dimensione $d$. 
 Da ogni chunk verranno poi estratte le feature precedentemente menzionate ed etichettate con la classe (quindi sensore) di appartenenza.
 Scegliere la giusta dimensione $d$ dei vari chunk \`e una scelta sensibile in quanto forzer\`a anche la dimensione dei chunk composti da residui di sensori che verranno calcolati durante il normale funzionamento del sistema.
@@ -244,14 +246,18 @@ L'idea \`e di avere chunk di serie temporali abbastanza grandi da catturare la d
 Tutte le istanze di $X$ che appartengono allo stesso sensore determinano il fingerprint del sensore e il primo compito della funzione $f$ (Funzione \ref{eq:3}) \`e quello di distinguere correttamente i sensori, 
 quindi generare un fingerprint il pi\`u preciso e privo di ambiguit\`a possibile. Nel Capitolo \ref{chap:5}, l'esistenza del fingerprint verr\`a provata empiricamente.
 
-L'algoritmo di M.L. utilizzato \`e il \textit{Support Vector Machine} (SVM), impiegato come un classificatore a 2 classi (One vs. One) che etichetta i dati provenienti dal legittimo sensore (\textit{ground truth}) come un \textit{1}
+L'algoritmo di M.L. utilizzato \`e il \textit{Support Vector Machine} (SVM)\cite{noble2006support}, impiegato come un classificatore a 2 classi (One vs. One) che etichetta i dati provenienti dal legittimo sensore (\textit{ground truth}) come un \textit{1}
 e come \textit{0} i dati provenienti dagli altri sensori. In questo modo gli attacchi possono essere considerati come un tipo dato appartenente ad altre classi.
 
-L'algoritmo SVM verr\`a allenato su un campione di dati che dipender\`a dal sistema considerato e verr\`a validato usando la tecnica del \textit{k-fold cross validation}.
+L'algoritmo SVM verr\`a allenato su un campione di dati che dipender\`a dal sistema considerato e verr\`a validato usando la tecnica del \textit{k-fold cross validation}\cite{refaeilzadeh2009cross}.
 Successivamente, siccome nel dataset non sono presenti dati relativi ad attacchi, il classificatore a 2 classi potrebbe mancare alcuni degli attacchi.
 
 Per affrontare questo problema viene utilizzato la modalit\`a di SVM ad una classe (\textit{one-class} SVM) per fare il learning del modello di M.L., basandosi su una classe di dati normali (appartenenti quindi ad un solo sensore). 
 Nella fase di testing tutto ci\`o reputato estraneo viene considerato come un attacco.
+
+Facendo dunque il punto della situazione, il problema di trovare la giusta dimensione dei chunk \`e affrontato come un problema di classificazione cercando di creare un fingerprint dei sensori il pi\`u preciso possibile.
+In questa fase dati appartenenti ad attacchi non sono conosciuti, e di conseguenza, usare il precedente modello potrebbe portare a farsi sfuggire alcuni (se non molti) attacchi.
+Per ovviare a questo problema, viene adoperato un classificatore ad una classe che, avendo come mezzo di confronto il fingerprint (di un determinato sensore), ha pi\`u possibilit\`a di rilevare possibili \textit{outlier}.
 
 % ----------------------------------------------------------------------------------------
 
@@ -259,11 +265,11 @@ Nella fase di testing tutto ci\`o reputato estraneo viene considerato come un at
 % describe here how you implemented the functionalities described in the methods section.
 % Use pseudo-code or diagrams.
 % Parlare del come si è implementato il rumore intrinseco in un modello symulink
-Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione dei vettori dei residui, nel presente lavoro viene presa una strada alternativa e pi\`u semplice di quella presentata in [1].
+Alla luce di quanto detto nel Capitolo \ref{chap:1} per quanto riguarda l'estrazione dei vettori dei residui, nel presente lavoro viene presa una strada alternativa e pi\`u semplice di quella presentata in \cite{ahmed2018noise}.
 
 Viene utilizzato un modello di sistema dinamico ideale, che non produce a livello delle misurazioni dei sensori alcun tipo di rumore. Successivamente, il rumore viene inserito ``artificialmente'', sotto forma di rumore gaussiano.
 
-Sia $y_k$ l'output di un sistema del tipo definito in \ref{eq:4} all'istante $k$ e siano $\mathcal{X}_j \sim~\mathcal{N}(0,\sigma_j^2)$, $j = 1,\ldots,m$\footnote{{$m$ \`e la dimensione di $y_k$, uguale al numero di sensori del sistema.}}, $m$ (una per sensore) distribuzioni di probabilit\`a gaussiane con media nulla e varianza $\sigma_j^2$.
+Sia $y_k$ l'output di un sistema del tipo definito in \ref{eq:4} all'istante $k$ e siano $\mathcal{X}_j \sim~\mathcal{N}(0,\sigma_j^2)$, $j = 1,\ldots,m$,\footnote{$m$ \`e la dimensione di $y_k$, uguale al numero di sensori del sistema.} $m$ (una per sensore) distribuzioni di probabilit\`a gaussiane con media nulla e varianza $\sigma_j^2$.
 Il valore in output del sistema dopo l'introduzione di rumore \`e uguale a
 \begin{equation}
     \bar{y}_k = y_k + \delta_k\label{eq:6},
@@ -276,11 +282,11 @@ Dal momento che ogni $r_j$ deve contenere valori di un sistema reale sottoposto 
     100 - \sqrt{\frac{\sum_{k=1}^n (\bar{y}_{j,k} - y_{j,k})^2}{n}} \geq D_j, \forall j\in\{1,\ldots,n\}\label{eq:7}.
 \end{equation}
 $D_j$ \`e un valore sempre maggiore o uguale di 70 e, in base al ruolo del sensore all'interno del sistema, pu\`o assumere valori pi\`u o meno grandi.
+Sensori che hanno compiti sensibili devono essere ``di buona fattura'' e cercare di ridurre al minimo l'errore introdotto nelle misurazioni (qualit\`a che soliatamente aumenta, e a volte non di poco, il costo del sensore).
 Sostituendo dall'Equazione \ref{eq:6}, si nota che l'RMSE per ogni sensore $j$ dipende banalmente dalla serie di valori estratti secondo $\mathcal{X}_j$.
 
 Calcolati i vettori dei residui e preparati (divisi in chunk ed estratte le feature) per essere processati dall'algoritmo SVM, e fatto il learning del modello di M.L., 
-quest'ultimo viene validato\footnote{Questa operazione, con un $k$ variabile, ha una duplice funzionalit\`a: quella di validare il modello di M.L. trovato e quella di capire quanto il modello \`e sensibile allla quantit\`a di dati utilizzati nella fase di learning.}
-tramite la k-fold cross validation con $k=2,\ldots,15$.
+quest'ultimo viene validato tramite la k-fold cross validation con $k=2,\ldots,15$.\footnote{Questa operazione, con un $k$ variabile, ha una duplice funzionalit\`a: quella di validare il modello di M.L. trovato e quella di capire quanto il modello \`e sensibile allla quantit\`a di dati utilizzati nella fase di learning.}
 Questo significa, per valori di $k$ crescenti, il dataset $D$ (per come \`e stato definito nel Capitolo \ref{chap:3}) viene suddiviso in $k$ partizioni e di queste, $k-1$ vengono utilizzate per fare il training e una per il testing.
 In questo modo si cerca di evitare problemi di sovradattamento, tipico della suddivisione del dataset in due partizioni.
 Per ogni $k$, l'accuratezza finale del modello \`e data dalla media delle accuratezze calcolate durante le $k$ fasti di test.
@@ -310,7 +316,7 @@ Gli obiettivi principali di questa fase sono molteplici.
 % describe experimental setting: hardware used, software used, data used, etc. ....
 Il software che implementa le funzionalit\`a qui presentate \`e stato scritto utilizzando diversi linguaggi di programmazione, tra cui principalmente Python e MATLAB.
 Il software utilizzato per ottenere dati provenienti da simulazioni di sistemi cyber-fisici \`e Simulink, un software per la simulazione e la modellazione di sistemi dinamici.
-La libreria sfruttata per quanto riguarda gli algoritmi Support Vector Machine \`e skikit-learn ([3]), basata su LibSVM ([4]).
+La libreria sfruttata per quanto riguarda gli algoritmi Support Vector Machine \`e skikit-learn \cite{pedregosa2011scikit}, basata su LibSVM \cite{chang2011libsvm}.
 
 \newpage
 \section{Casi di studio}
@@ -629,8 +635,11 @@ Attaccando la totalit\`a del chunk il rilevamento aumenta sensibilmente.
 % Sum up what you did and outline some possible future developments.
 % Lavori successivi: attacchi combinati su più sensori
 
-
 \backmatter
-% Inserire qui referenze e citazioni
+% bibliography
+% \cleardoublepage
+% \phantomsection
+\bibliographystyle{sapthesis} % BibTeX style
+\bibliography{refs} % BibTeX database without .bib extension
 
 \end{document}
